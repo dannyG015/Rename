@@ -38,12 +38,67 @@ function outputName(f){let e=extOf(f.file.name);return safeName(f.title)+(e?'.'+
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function setStatus(f,msg){f.status=msg;let el=document.querySelector(`[data-status="${f.id}"]`);if(el)el.textContent=msg}
 function updateCount(){$('count').textContent=files.length+(files.length===1?' Datei':' Dateien')}
+
+/* Dauerhafte lokale Speicherung: Die Originaldateien und bearbeiteten Namen
+   bleiben auch nach Tab-Wechsel, Neuladen oder Browser-Wiederherstellung erhalten. */
+const STORAGE_DB='smart-file-renamer-db-v2', STORAGE_STORE='documents';
+let storageDBPromise=null;
+function openStorageDB(){
+  if(!('indexedDB' in window))return Promise.reject(new Error('IndexedDB wird von diesem Browser nicht unterstützt.'));
+  if(storageDBPromise)return storageDBPromise;
+  storageDBPromise=new Promise((resolve,reject)=>{
+    const request=indexedDB.open(STORAGE_DB,1);
+    request.onupgradeneeded=()=>{
+      const db=request.result;
+      if(!db.objectStoreNames.contains(STORAGE_STORE))db.createObjectStore(STORAGE_STORE,{keyPath:'id'});
+    };
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error||new Error('Lokaler Speicher konnte nicht geöffnet werden.'));
+  });
+  return storageDBPromise;
+}
+async function persistFile(f){
+  if(!files.some(item=>item.id===f.id))return false;
+  try{
+    const db=await openStorageDB();
+    const record={id:f.id,name:f.file.name,type:f.file.type||'',lastModified:f.file.lastModified||Date.now(),blob:f.file.slice(0,f.file.size,f.file.type||'application/octet-stream'),title:f.title,status:f.status||'',text:f.text||'',ready:!!f.ready,edited:!!f.edited};
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction(STORAGE_STORE,'readwrite');
+      tx.objectStore(STORAGE_STORE).put(record);
+      tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('Speichern abgebrochen.'));
+    });
+    return true;
+  }catch(err){console.warn('Lokale Dateispeicherung nicht möglich:',err);return false;}
+}
+async function removeStoredFile(id){
+  try{const db=await openStorageDB();await new Promise((resolve,reject)=>{const tx=db.transaction(STORAGE_STORE,'readwrite');tx.objectStore(STORAGE_STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}catch(err){console.warn('Datei konnte nicht aus lokalem Speicher entfernt werden:',err);}
+}
+async function clearStoredFiles(){
+  try{const db=await openStorageDB();await new Promise((resolve,reject)=>{const tx=db.transaction(STORAGE_STORE,'readwrite');tx.objectStore(STORAGE_STORE).clear();tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}catch(err){console.warn('Lokaler Speicher konnte nicht geleert werden:',err);}
+}
+async function restoreStoredFiles(){
+  try{
+    const db=await openStorageDB();
+    try{if(navigator.storage&&navigator.storage.persist)await navigator.storage.persist();}catch(_){}
+    const records=await new Promise((resolve,reject)=>{const tx=db.transaction(STORAGE_STORE,'readonly');const req=tx.objectStore(STORAGE_STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);});
+    for(const r of records){
+      if(files.some(f=>f.id===r.id))continue;
+      const restoredFile=new File([r.blob],r.name,{type:r.type||r.blob?.type||'',lastModified:r.lastModified||Date.now()});
+      files.push({id:r.id,file:restoredFile,title:r.title||baseOf(r.name),status:r.status||'Aus lokalem Speicher wiederhergestellt.',text:r.text||'',ready:!!r.ready,edited:!!r.edited});
+      serial=Math.max(serial,Number(r.id)+1);
+    }
+    if(records.length){render();}
+    // Eine während der Analyse geschlossene Seite kann einen unvollständigen Eintrag enthalten.
+    for(const f of files){if(!f.ready)analyze(f);}
+  }catch(err){console.warn('Gespeicherte Dateien konnten nicht wiederhergestellt werden:',err);}
+}
+let storageReady=restoreStoredFiles();
 function render(){if(!files.length){$('list').innerHTML='<div class="empty">Noch keine Dateien hinzugefügt.</div>';updateCount();return} $('list').innerHTML=files.map(f=>`<article class="file" data-card="${f.id}"><div class="file-main"><div class="original">${esc(f.file.name)}</div><div class="name-row"><input class="name-input" type="text" data-name="${f.id}" value="${esc(f.title)}" aria-label="Dateiname bearbeiten" autocomplete="off"><span class="extension">.${esc(extOf(f.file.name)||'Datei')}</span></div><div class="status" data-status="${f.id}">${esc(f.status)}</div></div><div class="file-actions"><button class="icon" data-act="preview" data-id="${f.id}" title="Vorschau" aria-label="Vorschau">${icons.eye}</button><button class="icon" data-act="download" data-id="${f.id}" title="Herunterladen" aria-label="Herunterladen">${icons.down}</button><button class="icon del" data-act="delete" data-id="${f.id}" title="Löschen" aria-label="Löschen">${icons.trash}</button></div></article>`).join('');updateCount()}
-function addFiles(list){for(const file of Array.from(list||[])){let e=extOf(file.name);if(!['pdf','docx','xlsx','xls','pptx','txt','png','jpg','jpeg','webp'].includes(e)){alert('Dateityp nicht unterstützt: '+file.name);continue}let f={id:serial++,file,title:baseOf(file.name),status:'Analyse läuft …',text:'',ready:false};files.push(f);render();analyze(f)}updateCount()}
+async function addFiles(list){await storageReady;for(const file of Array.from(list||[])){let e=extOf(file.name);if(!['pdf','docx','xlsx','xls','pptx','txt','png','jpg','jpeg','webp'].includes(e)){alert('Dateityp nicht unterstützt: '+file.name);continue}let f={id:serial++,file,title:baseOf(file.name),status:'Analyse läuft …',text:'',ready:false};files.push(f);render();await persistFile(f);analyze(f)}updateCount()}
 $('choose').addEventListener('click',e=>{e.stopPropagation();$('picker').click()});$('drop').addEventListener('click',e=>{if(!e.target.closest('button'))$('picker').click()});$('picker').addEventListener('change',e=>{addFiles(e.target.files);e.target.value=''});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('over')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('over'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('over');addFiles(e.dataTransfer.files)});
-$('list').addEventListener('input',e=>{let input=e.target.closest('[data-name]');if(!input)return;let f=files.find(x=>x.id===Number(input.dataset.name));if(f){f.title=input.value;f.edited=true;setStatus(f,'Dateiname bearbeitet')}});
-$('list').addEventListener('click',async e=>{let b=e.target.closest('button[data-act]');if(!b)return;let f=files.find(x=>x.id===Number(b.dataset.id));if(!f)return;if(b.dataset.act==='delete'){files=files.filter(x=>x.id!==f.id);render()}else if(b.dataset.act==='preview')await preview(f);else if(b.dataset.act==='download')await downloadOne(f)});
-$('clear').addEventListener('click',()=>{if(!files.length)return;if(confirm('Möchtest du wirklich alle Dateien aus der Liste entfernen?')){files=[];render();closeModal()}});
+$('list').addEventListener('input',e=>{let input=e.target.closest('[data-name]');if(!input)return;let f=files.find(x=>x.id===Number(input.dataset.name));if(f){f.title=input.value;f.edited=true;setStatus(f,'Dateiname bearbeitet');persistFile(f)}});
+$('list').addEventListener('click',async e=>{let b=e.target.closest('button[data-act]');if(!b)return;let f=files.find(x=>x.id===Number(b.dataset.id));if(!f)return;if(b.dataset.act==='delete'){files=files.filter(x=>x.id!==f.id);removeStoredFile(f.id);render()}else if(b.dataset.act==='preview')await preview(f);else if(b.dataset.act==='download')await downloadOne(f)});
+$('clear').addEventListener('click',()=>{if(!files.length)return;if(confirm('Möchtest du wirklich alle Dateien aus der Liste entfernen?')){files=[];render();closeModal();clearStoredFiles()}});
 function normalizeText(t){return String(t||'').replace(/\u0000/g,'').replace(/\r/g,'\n').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim()}
 
 /* -------------------------------------------------------
@@ -316,7 +371,7 @@ async function analyze(f){
       setStatus(f,'Bild wird per OCR vollständig analysiert …');
       const result=await ocrImage(f.file);text=result.text;ocrLines=result.lines;
     }
-  }catch(err){console.warn('Analyse:',err);setStatus(f,'Automatische Erkennung nicht möglich – Dateiname manuell bearbeiten.');f.ready=true;return}
+  }catch(err){console.warn('Analyse:',err);setStatus(f,'Automatische Erkennung nicht möglich – Dateiname manuell bearbeiten.');f.ready=true;await persistFile(f);return}
   f.text=normalizeText(text);
   const suggestion=titleFromText(f.text,'',ocrLines,priority);
   if(suggestion){if(!f.edited)f.title=suggestion;setStatus(f,'Titelvorschlag erstellt – bitte vollständigen Titel prüfen.');}
@@ -327,6 +382,7 @@ async function analyze(f){
   f.ready=true;
   const input=document.querySelector(`[data-name="${f.id}"]`);
   if(input&&!f.edited&&document.activeElement!==input)input.value=f.title;
+  await persistFile(f);
 }
 
 function openModal(title,foot='Vorschau'){modalToken++;$('modalTitle').textContent=title;$('modalFoot').textContent=foot;$('modalBody').innerHTML='<div class="loading">Lade Inhalt …</div>';$('overlay').style.display='flex';requestAnimationFrame(()=>$('overlay').classList.add('open'));document.body.style.overflow='hidden';return modalToken}
@@ -399,8 +455,31 @@ $('modalBody').addEventListener('click',async e=>{
   setTimeout(()=>{if(button.isConnected)button.textContent='Seitentext kopieren'},1800);
 });
 
-async function downloadBlob(blob,name){let url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.style.display='none';document.body.append(a);a.click();a.remove();let ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(ios){let token=openModal('Datei speichern',name+' · iOS/Safari');let msg=document.createElement('p');msg.className='preview-text';msg.textContent='Wenn der Download nicht automatisch startet, tippe auf den Link. In Safari kannst du anschließend über „Teilen“ → „In Dateien sichern“ speichern.';let link=document.createElement('a');link.className='download-link';link.href=url;link.target='_blank';link.rel='noopener';link.download=name;link.textContent='Datei öffnen / speichern';$('modalBody').replaceChildren(msg,link)}else setTimeout(()=>URL.revokeObjectURL(url),120000)}
-async function downloadOne(f){try{await downloadBlob(f.file,outputName(f));setStatus(f,'Download ausgelöst.')}catch(err){console.error(err);setStatus(f,'Download fehlgeschlagen: '+err.message);alert('Download fehlgeschlagen: '+err.message)}}
+async function downloadBlob(blob,name,options={}){
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  // Bei einzelnen Dateien auf iOS das native Teilen-Menü nutzen. Dadurch wird
+  // insbesondere eine PDF nicht versehentlich als neue Browserseite geöffnet.
+  if(options.single&&isIOS&&navigator.share&&navigator.canShare){
+    try{
+      const file=new File([blob],name,{type:blob.type||'application/octet-stream',lastModified:Date.now()});
+      if(navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:name});
+        return 'shared';
+      }
+    }catch(err){
+      if(err&&err.name==='AbortError')return 'cancelled';
+      console.warn('Dateifreigabe nicht verfügbar; normaler Download wird versucht:',err);
+    }
+  }
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=name;a.setAttribute('download',name);a.style.display='none';
+  document.body.appendChild(a);a.click();a.remove();
+  // Niemals target=_blank oder window.open: die Anwendung bleibt im selben Tab.
+  // Blob-URLs nicht sofort widerrufen, da Safari den Download verzögert starten kann.
+  setTimeout(()=>URL.revokeObjectURL(url),5*60*1000);
+  return 'download';
+}
+async function downloadOne(f){try{const result=await downloadBlob(f.file,outputName(f),{single:true});if(result==='shared')setStatus(f,'Datei im Teilen-Menü bereit – „In Dateien sichern“ auswählen.');else if(result==='cancelled')setStatus(f,'Speichern abgebrochen.');else setStatus(f,'Download ausgelöst.');}catch(err){console.error(err);setStatus(f,'Download fehlgeschlagen: '+err.message);alert('Download fehlgeschlagen: '+err.message)}}
 $('zip').addEventListener('click',async()=>{if(!files.length){alert('Es sind keine Dateien vorhanden.');return}if(!window.JSZip){alert('ZIP-Bibliothek fehlt. Bitte Seite neu laden und Internetverbindung prüfen.');return}let btn=$('zip'),old=btn.textContent;btn.disabled=true;btn.textContent='ZIP wird erstellt …';$('progress').style.display='block';$('bar').style.width='0%';try{let zip=new JSZip(),used=new Set();for(let f of files){let name=uniqueName(outputName(f),used);used.add(name);zip.file(name,f.file)}let blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:5}},m=>$('bar').style.width=m.percent.toFixed(0)+'%');await downloadBlob(blob,'Smart_File_Renamer.zip')}catch(err){console.error(err);alert('ZIP konnte nicht erstellt werden: '+err.message)}finally{btn.disabled=false;btn.textContent=old;setTimeout(()=>{$('progress').style.display='none';$('bar').style.width='0%'},900)}});
 function uniqueName(name,used){if(!used.has(name))return name;let i=name.lastIndexOf('.'),base=i>0?name.slice(0,i):name,ext=i>0?name.slice(i):'',n=2,candidate;do{candidate=base+' ('+n+++')'+ext}while(used.has(candidate));return candidate}
 render();
