@@ -79,7 +79,8 @@ async function clearStoredFiles(){
 async function restoreStoredFiles(){
   try{
     const db=await openStorageDB();
-    try{if(navigator.storage&&navigator.storage.persist)await navigator.storage.persist();}catch(_){}
+    // Persistenzberechtigung im Hintergrund anfragen; sie darf das Laden nicht blockieren.
+    try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});}catch(_){}
     const records=await new Promise((resolve,reject)=>{const tx=db.transaction(STORAGE_STORE,'readonly');const req=tx.objectStore(STORAGE_STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);});
     for(const r of records){
       if(files.some(f=>f.id===r.id))continue;
@@ -87,15 +88,38 @@ async function restoreStoredFiles(){
       files.push({id:r.id,file:restoredFile,title:r.title||baseOf(r.name),status:r.status||'Aus lokalem Speicher wiederhergestellt.',text:r.text||'',ready:!!r.ready,edited:!!r.edited});
       serial=Math.max(serial,Number(r.id)+1);
     }
-    if(records.length){render();}
-    // Eine während der Analyse geschlossene Seite kann einen unvollständigen Eintrag enthalten.
+    if(records.length)render();
+    // Unvollständige Analysen nach dem Wiederherstellen fortsetzen.
     for(const f of files){if(!f.ready)analyze(f);}
   }catch(err){console.warn('Gespeicherte Dateien konnten nicht wiederhergestellt werden:',err);}
 }
 let storageReady=restoreStoredFiles();
 function render(){if(!files.length){$('list').innerHTML='<div class="empty">Noch keine Dateien hinzugefügt.</div>';updateCount();return} $('list').innerHTML=files.map(f=>`<article class="file" data-card="${f.id}"><div class="file-main"><div class="original">${esc(f.file.name)}</div><div class="name-row"><input class="name-input" type="text" data-name="${f.id}" value="${esc(f.title)}" aria-label="Dateiname bearbeiten" autocomplete="off"><span class="extension">.${esc(extOf(f.file.name)||'Datei')}</span></div><div class="status" data-status="${f.id}">${esc(f.status)}</div></div><div class="file-actions"><button class="icon" data-act="preview" data-id="${f.id}" title="Vorschau" aria-label="Vorschau">${icons.eye}</button><button class="icon" data-act="download" data-id="${f.id}" title="Herunterladen" aria-label="Herunterladen">${icons.down}</button><button class="icon del" data-act="delete" data-id="${f.id}" title="Löschen" aria-label="Löschen">${icons.trash}</button></div></article>`).join('');updateCount()}
-async function addFiles(list){await storageReady;for(const file of Array.from(list||[])){let e=extOf(file.name);if(!['pdf','docx','xlsx','xls','pptx','txt','png','jpg','jpeg','webp'].includes(e)){alert('Dateityp nicht unterstützt: '+file.name);continue}let f={id:serial++,file,title:baseOf(file.name),status:'Analyse läuft …',text:'',ready:false};files.push(f);render();await persistFile(f);analyze(f)}updateCount()}
-$('choose').addEventListener('click',e=>{e.stopPropagation();$('picker').click()});$('drop').addEventListener('click',e=>{if(!e.target.closest('button'))$('picker').click()});$('picker').addEventListener('change',e=>{addFiles(e.target.files);e.target.value=''});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('over')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('over'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('over');addFiles(e.dataTransfer.files)});
+async function addFiles(list){
+  // Dateien sofort in den Arbeitsspeicher und in die sichtbare Liste übernehmen.
+  // Das Warten auf IndexedDB darf die Dateiauswahl auf iOS/Safari nicht blockieren.
+  const selectedFiles=Array.from(list||[]);
+  if(!selectedFiles.length)return;
+  const accepted=[];
+  for(const file of selectedFiles){
+    const e=extOf(file.name);
+    if(!['pdf','docx','xlsx','xls','pptx','txt','png','jpg','jpeg','webp'].includes(e)){alert('Dateityp nicht unterstützt: '+file.name);continue;}
+    const f={id:serial++,file,title:baseOf(file.name),status:'Analyse läuft …',text:'',ready:false};
+    files.push(f);accepted.push(f);
+  }
+  render();updateCount();
+  // Analyse unabhängig von der lokalen Speicherung starten.
+  for(const f of accepted){
+    persistFile(f).catch(err=>console.warn('Speichern übersprungen:',err));
+    analyze(f);
+  }
+}
+$('choose').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();$('picker').click()});
+$('drop').addEventListener('click',e=>{if(!e.target.closest('button'))$('picker').click()});
+$('picker').addEventListener('change',e=>{const chosen=Array.from(e.target.files||[]);e.target.value='';addFiles(chosen)});
+$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('over')});
+$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('over'));
+$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('over');addFiles(Array.from(e.dataTransfer?.files||[]))});
 $('list').addEventListener('input',e=>{let input=e.target.closest('[data-name]');if(!input)return;let f=files.find(x=>x.id===Number(input.dataset.name));if(f){f.title=input.value;f.edited=true;setStatus(f,'Dateiname bearbeitet');persistFile(f)}});
 $('list').addEventListener('click',async e=>{let b=e.target.closest('button[data-act]');if(!b)return;let f=files.find(x=>x.id===Number(b.dataset.id));if(!f)return;if(b.dataset.act==='delete'){files=files.filter(x=>x.id!==f.id);removeStoredFile(f.id);render()}else if(b.dataset.act==='preview')await preview(f);else if(b.dataset.act==='download')await downloadOne(f)});
 $('clear').addEventListener('click',()=>{if(!files.length)return;if(confirm('Möchtest du wirklich alle Dateien aus der Liste entfernen?')){files=[];render();closeModal();clearStoredFiles()}});
