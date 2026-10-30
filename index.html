@@ -456,30 +456,26 @@ $('modalBody').addEventListener('click',async e=>{
 });
 
 async function downloadBlob(blob,name,options={}){
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-  // Bei einzelnen Dateien auf iOS das native Teilen-Menü nutzen. Dadurch wird
-  // insbesondere eine PDF nicht versehentlich als neue Browserseite geöffnet.
-  if(options.single&&isIOS&&navigator.share&&navigator.canShare){
-    try{
-      const file=new File([blob],name,{type:blob.type||'application/octet-stream',lastModified:Date.now()});
-      if(navigator.canShare({files:[file]})){
-        await navigator.share({files:[file],title:name});
-        return 'shared';
-      }
-    }catch(err){
-      if(err&&err.name==='AbortError')return 'cancelled';
-      console.warn('Dateifreigabe nicht verfügbar; normaler Download wird versucht:',err);
-    }
-  }
-  const url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download=name;a.setAttribute('download',name);a.style.display='none';
-  document.body.appendChild(a);a.click();a.remove();
-  // Niemals target=_blank oder window.open: die Anwendung bleibt im selben Tab.
-  // Blob-URLs nicht sofort widerrufen, da Safari den Download verzögert starten kann.
+  // Einzeldateien genauso wie ZIPs als Download auslösen. Bei PDFs verhindert
+  // application/octet-stream in Safari möglichst die direkte PDF-Navigation.
+  const downloadBlobData=options.single
+    ? new Blob([blob],{type:'application/octet-stream'})
+    : blob;
+  const url=URL.createObjectURL(downloadBlobData);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=name;
+  a.setAttribute('download',name);
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  // Kein target=_blank, kein window.open und kein Teilen-Menü.
+  // Blob-URL nicht sofort widerrufen, da Safari den Download verzögert starten kann.
   setTimeout(()=>URL.revokeObjectURL(url),5*60*1000);
   return 'download';
 }
-async function downloadOne(f){try{const result=await downloadBlob(f.file,outputName(f),{single:true});if(result==='shared')setStatus(f,'Datei im Teilen-Menü bereit – „In Dateien sichern“ auswählen.');else if(result==='cancelled')setStatus(f,'Speichern abgebrochen.');else setStatus(f,'Download ausgelöst.');}catch(err){console.error(err);setStatus(f,'Download fehlgeschlagen: '+err.message);alert('Download fehlgeschlagen: '+err.message)}}
+async function downloadOne(f){try{await downloadBlob(f.file,outputName(f),{single:true});setStatus(f,'Download ausgelöst.');}catch(err){console.error(err);setStatus(f,'Download fehlgeschlagen: '+err.message);alert('Download fehlgeschlagen: '+err.message)}}
 $('zip').addEventListener('click',async()=>{if(!files.length){alert('Es sind keine Dateien vorhanden.');return}if(!window.JSZip){alert('ZIP-Bibliothek fehlt. Bitte Seite neu laden und Internetverbindung prüfen.');return}let btn=$('zip'),old=btn.textContent;btn.disabled=true;btn.textContent='ZIP wird erstellt …';$('progress').style.display='block';$('bar').style.width='0%';try{let zip=new JSZip(),used=new Set();for(let f of files){let name=uniqueName(outputName(f),used);used.add(name);zip.file(name,f.file)}let blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:5}},m=>$('bar').style.width=m.percent.toFixed(0)+'%');await downloadBlob(blob,'Smart_File_Renamer.zip')}catch(err){console.error(err);alert('ZIP konnte nicht erstellt werden: '+err.message)}finally{btn.disabled=false;btn.textContent=old;setTimeout(()=>{$('progress').style.display='none';$('bar').style.width='0%'},900)}});
 function uniqueName(name,used){if(!used.has(name))return name;let i=name.lastIndexOf('.'),base=i>0?name.slice(0,i):name,ext=i>0?name.slice(i):'',n=2,candidate;do{candidate=base+' ('+n+++')'+ext}while(used.has(candidate));return candidate}
 render();
