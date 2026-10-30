@@ -13,7 +13,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#111317;--panel:#1b1f26;--panel2:#252a33;--line:#353c47;--text:#f3f5f7;--muted:#a4acb8;--accent:#e7ebf0;--green:#62d39a;--red:#ff9292}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}.app{width:min(1080px,94%);margin:auto;padding:30px 0 65px}header{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:27px}h1{font-size:clamp(26px,5vw,36px);letter-spacing:-1px;margin:0 0 6px}.sub{font-size:14px;color:var(--muted)}.tag{border:1px solid var(--line);border-radius:30px;padding:8px 12px;color:#cbd1d9;font-size:12px;white-space:nowrap}.drop{border:1.5px dashed #515b69;border-radius:17px;background:#191d23;padding:38px 18px;text-align:center;transition:.2s;cursor:pointer}.drop.over{border-color:#f1f3f6;background:#262c35}.drop .symbol{font-size:34px;margin-bottom:10px}.drop h2{font-size:18px;margin:0 0 7px}.drop p{font-size:13px;color:var(--muted);margin:0 0 17px}.btn{border:0;border-radius:9px;padding:11px 15px;font-size:13px;font-weight:650}.primary{background:var(--accent);color:#15181d}.secondary{background:#343b46;color:var(--text)}.danger{background:#492b30;color:#ffc0c0}.btn:disabled{opacity:.5;cursor:wait}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:27px 0 14px}.toolbar h2{font-size:17px;margin:0}.count{font-size:13px;color:var(--muted);margin-left:8px}.actions{display:flex;gap:8px;flex-wrap:wrap}.list{display:grid;gap:11px}.empty{padding:38px 15px;border:1px dashed var(--line);border-radius:13px;text-align:center;color:var(--muted);font-size:14px}.file{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:13px;align-items:center}.file-main{min-width:0}.original{font-size:12px;color:var(--muted);overflow-wrap:anywhere;margin-bottom:8px}.name-row{display:flex;gap:8px;align-items:center}.name-input{width:100%;min-width:0;background:#11151a;color:var(--text);border:1px solid #48515e;border-radius:8px;padding:10px;outline:none}.name-input:focus{border-color:#e3e7ec;box-shadow:0 0 0 2px #e3e7ec22}.extension{color:var(--muted);font-size:12px;white-space:nowrap}.status{font-size:11px;color:var(--muted);margin-top:7px;min-height:14px}.file-actions{display:flex;gap:7px}.icon{width:39px;height:39px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:#f1f3f5;display:grid;place-items:center}.icon svg{width:18px;height:18px}.icon.del{color:var(--red)}.progress{height:4px;background:#303640;border-radius:5px;overflow:hidden;margin-top:17px;display:none}.bar{height:100%;width:0;background:#e4e8ed;transition:width .15s}.note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:15px}.overlay{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:12px;background:#07090dcc;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);opacity:0;transition:opacity .18s}.overlay.open{display:flex;opacity:1}.modal{width:min(960px,100%);height:min(91vh,900px);background:#191d23;border:1px solid #424a56;border-radius:15px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 90px #0009}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}.modal-title{font-size:14px;font-weight:650;overflow-wrap:anywhere}.close{border:0;border-radius:8px;background:#343b46;color:white;width:36px;height:36px;font-size:23px}.modal-body{padding:16px;overflow:auto;min-height:0;flex:1;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.modal-foot{padding:11px 15px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.loading,.error{padding:45px 15px;text-align:center;color:var(--muted);line-height:1.6}.preview-image{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;margin:auto;border-radius:5px;background:#fff}.preview-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:14px}.doc-preview{background:white;color:#17191d;border-radius:7px;padding:22px;line-height:1.5;overflow-wrap:anywhere}.doc-preview img{max-width:100%}.pdf-page{display:block;width:100%;max-width:850px;height:auto;margin:0 auto 16px;background:white;box-shadow:0 3px 15px #0005}.pdf-page-wrap{position:relative;width:max-content;max-width:100%;margin:0 auto 16px;background:#fff;box-shadow:0 3px 15px #0005}.pdf-page-wrap canvas{display:block;width:100%;height:auto}.pdf-text-layer{position:absolute;inset:0;overflow:hidden;line-height:1;user-select:text;-webkit-user-select:text;touch-action:pan-y}.pdf-text-layer span{position:absolute;color:transparent;white-space:pre;cursor:text;transform-origin:0 0;user-select:text;-webkit-user-select:text}.pdf-text-layer span::selection{background:rgba(55,125,255,.42);color:transparent}.download-link{display:inline-block;margin-top:14px;padding:12px 16px;border-radius:9px;background:#e7ebf0;color:#17191d;font-weight:700;text-decoration:none;overflow-wrap:anywhere}.hidden{display:none!important}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}.app{width:min(1080px,94%);margin:auto;padding:30px 0 65px}header{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:27px}h1{font-size:clamp(26px,5vw,36px);letter-spacing:-1px;margin:0 0 6px}.sub{font-size:14px;color:var(--muted)}.tag{border:1px solid var(--line);border-radius:30px;padding:8px 12px;color:#cbd1d9;font-size:12px;white-space:nowrap}.drop{border:1.5px dashed #515b69;border-radius:17px;background:#191d23;padding:38px 18px;text-align:center;transition:.2s;cursor:pointer}.drop.over{border-color:#f1f3f6;background:#262c35}.drop .symbol{font-size:34px;margin-bottom:10px}.drop h2{font-size:18px;margin:0 0 7px}.drop p{font-size:13px;color:var(--muted);margin:0 0 17px}.btn{border:0;border-radius:9px;padding:11px 15px;font-size:13px;font-weight:650}.primary{background:var(--accent);color:#15181d}.secondary{background:#343b46;color:var(--text)}.danger{background:#492b30;color:#ffc0c0}.btn:disabled{opacity:.5;cursor:wait}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:27px 0 14px}.toolbar h2{font-size:17px;margin:0}.count{font-size:13px;color:var(--muted);margin-left:8px}.actions{display:flex;gap:8px;flex-wrap:wrap}.list{display:grid;gap:11px}.empty{padding:38px 15px;border:1px dashed var(--line);border-radius:13px;text-align:center;color:var(--muted);font-size:14px}.file{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:13px;align-items:center}.file-main{min-width:0}.original{font-size:12px;color:var(--muted);overflow-wrap:anywhere;margin-bottom:8px}.name-row{display:flex;gap:8px;align-items:center}.name-input{width:100%;min-width:0;background:#11151a;color:var(--text);border:1px solid #48515e;border-radius:8px;padding:10px;outline:none}.name-input:focus{border-color:#e3e7ec;box-shadow:0 0 0 2px #e3e7ec22}.extension{color:var(--muted);font-size:12px;white-space:nowrap}.status{font-size:11px;color:var(--muted);margin-top:7px;min-height:14px}.file-actions{display:flex;gap:7px}.icon{width:39px;height:39px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:#f1f3f5;display:grid;place-items:center}.icon svg{width:18px;height:18px}.icon.del{color:var(--red)}.progress{height:4px;background:#303640;border-radius:5px;overflow:hidden;margin-top:17px;display:none}.bar{height:100%;width:0;background:#e4e8ed;transition:width .15s}.note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:15px}.overlay{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:12px;background:#07090dcc;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);opacity:0;transition:opacity .18s}.overlay.open{display:flex;opacity:1}.modal{width:min(960px,100%);height:min(91vh,900px);background:#191d23;border:1px solid #424a56;border-radius:15px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 90px #0009}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}.modal-title{font-size:14px;font-weight:650;overflow-wrap:anywhere}.close{border:0;border-radius:8px;background:#343b46;color:white;width:36px;height:36px;font-size:23px}.modal-body{padding:16px;overflow:auto;min-height:0;flex:1;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.modal-foot{padding:11px 15px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.loading,.error{padding:45px 15px;text-align:center;color:var(--muted);line-height:1.6}.preview-image{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;margin:auto;border-radius:5px;background:#fff}.preview-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:14px}.doc-preview{background:white;color:#17191d;border-radius:7px;padding:22px;line-height:1.5;overflow-wrap:anywhere}.doc-preview img{max-width:100%}.pdf-page{display:block;width:100%;max-width:850px;height:auto;margin:0 auto 16px;background:white;box-shadow:0 3px 15px #0005}.pdf-page-wrap{position:relative;width:max-content;max-width:100%;margin:0 auto 16px;background:#fff;box-shadow:0 3px 15px #0005}.pdf-page-wrap canvas{display:block;width:100%;height:auto}.pdf-text-layer{position:absolute;inset:0;overflow:hidden;line-height:1;user-select:text;-webkit-user-select:text;touch-action:pan-y}.pdf-text-layer span{position:absolute;color:transparent;white-space:pre;cursor:text;transform-origin:0 0;user-select:text;-webkit-user-select:text}.pdf-text-layer span::selection{background:rgba(55,125,255,.42);color:transparent}.pdf-select-panel{max-width:850px;margin:-5px auto 18px;border:1px solid #454d59;border-radius:9px;background:#20252d;overflow:hidden}.pdf-select-panel summary{padding:11px 13px;color:#e6eaf0;font-size:13px;cursor:pointer;user-select:none;-webkit-user-select:none}.pdf-select-panel textarea{display:block;width:100%;min-height:130px;max-height:360px;resize:vertical;border:0;border-top:1px solid #454d59;border-radius:0;background:#15191f;color:#e9edf2;padding:12px;font:13px/1.55 ui-monospace,SFMono-Regular,monospace;white-space:pre-wrap;user-select:text;-webkit-user-select:text;touch-action:pan-y}.pdf-copy-row{display:flex;justify-content:flex-end;padding:8px;border-top:1px solid #454d59}.pdf-copy-btn{border:0;border-radius:7px;padding:8px 12px;background:#e7ebf0;color:#17191d;font-size:12px;font-weight:650}.pdf-select-help{max-width:850px;margin:0 auto 12px;color:var(--muted);font-size:12px;line-height:1.45}.download-link{display:inline-block;margin-top:14px;padding:12px 16px;border-radius:9px;background:#e7ebf0;color:#17191d;font-weight:700;text-decoration:none;overflow-wrap:anywhere}.hidden{display:none!important}
 @media(max-width:620px){.app{padding-top:22px}header{align-items:flex-start}.tag{display:none}.file{grid-template-columns:1fr}.file-actions{justify-content:flex-end}.actions{width:100%}.actions .btn{flex:1}.modal{height:94vh}.name-row{gap:5px}}
 </style>
 </head>
@@ -30,7 +30,7 @@
 <script>
 'use strict';
 if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-const $=id=>document.getElementById(id);let files=[],serial=1,ocrWorkerPromise=null,modalToken=0;
+const $=id=>document.getElementById(id);let files=[],serial=1,ocrWorkerPromise=null,modalToken=0,pdfPageTexts=new Map();
 const icons={eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg>',trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m5-6v6"/></svg>'};
 const extOf=n=>{let i=n.lastIndexOf('.');return i>0?n.slice(i+1).toLowerCase():''};const baseOf=n=>{let i=n.lastIndexOf('.');return i>0?n.slice(0,i):n};
 function safeName(s){return String(s||'').replace(/[<>:"/\\|?*\x00-\x1F]/g,' ').replace(/\s+/g,' ').replace(/[. ]+$/g,'').trim().slice(0,220)||'Dokument'}
@@ -62,23 +62,23 @@ function titleQuality(raw){
   if(len<4||len>360||words.length>55)return -1000;
   if(TITLE_STOP.test(text)||GENERIC_STOP.test(text))return -1000;
   if(/^[\d\W_]+$/.test(text)||/^[A-Z0-9_-]{1,8}$/.test(text))return -1000;
-  if(/^(tel\.?|telefon|fax|e-?mail|email|straße|str\.|plz|ust-?id)/i.test(text))return -1000;
+  if(/^(tel\.?|telefon|fax|e-?mail|email|straße|str\.?|plz|ust-?id)/i.test(text))return -1000;
   let score=0;
   if(words.length>=2)score+=19;
   if(words.length>=3&&words.length<=18)score+=10;
-  if(len>=12&&len<=130)score+=17;
-  else if(len>130&&len<=230)score+=12;
-  else if(len>230)score+=4;
+  if(len>=12&&len<=130)score+=17;else if(len>130&&len<=230)score+=12;else if(len>230)score+=4;
   if(/[A-ZÄÖÜ]/.test(text))score+=5;
-  if(/^[A-ZÄÖÜ0-9][^.!?]{3,}$/.test(text))score+=3;
   if(TITLE_WORDS.test(text))score+=7;
   if(/[.!?]$/.test(text))score-=13;
   if(/[,:;]$/.test(text))score-=2;
   if(words.length===1){score-=12;if(/^(rechnung|angebot|vertrag|bericht|protokoll|bescheinigung|zertifikat|lebenslauf|bewerbung|zeugnis|antrag|quittung|invoice|receipt|certificate|resume)$/i.test(text))score+=22;}
   if(words.length>28)score-=Math.min(28,(words.length-28)*2);
-  // Ein normaler Fließtextsatz ist selten ein Dokumenttitel.
   if(words.length>12&&/[.!?]\s/.test(text))score-=18;
   if(words.length>5&&/[.!?]$/.test(text))score-=18;
+  // Typische institutionelle Kopfzeilen sind selten der eigentliche Recherche-/Dokumenttitel.
+  if(/\b(universit(?:ät|y)|hochschule|fachhochschule|institut|institute|department|faculty|fakultät|lehrstuhl|school of|university of|technische universität|technical university)\b/i.test(text))score-=30;
+  if(/\b(autor|author|betreuer|supervisor|eingereicht bei|submitted to|matrikelnummer|student id)\b/i.test(text))score-=18;
+  if(/\b(research paper|wissenschaftliche arbeit|studienarbeit|abschlussarbeit|masterarbeit|bachelorarbeit|dissertation|thesis|seminararbeit|projektarbeit)\b/i.test(text))score+=12;
   return score;
 }
 function joinTitleLines(lines){
@@ -111,7 +111,7 @@ function makeTextCandidates(text){
       const base=titleQuality(joined);
       if(base<0)continue;
       let score=base;
-      score+=Math.max(0,25-i*1.25);
+      score+=Math.max(0,7-i*.35);
       if(group.length>1)score+=Math.min(24,(group.length-1)*6);
       if(group.length>6)score-=(group.length-6)*5;
       if(group.every(x=>x.length<95))score+=4;
@@ -152,10 +152,12 @@ function makeOcrCandidates(lines){
       const base=titleQuality(joined);
       if(base<0)continue;
       let score=base;
-      const topPosition=1-((group[0].y0-minY)/pageH);
-      score+=Math.max(-5,Math.min(22,topPosition*22));
+      const topPosition=(group[0].y0-minY)/pageH;
+      // Kopfzeilen am äußersten oberen Rand (Logo/Institut) werden abgewertet.
+      if(topPosition<.12)score-=18;
+      else if(topPosition<.72)score+=Math.max(0,12-Math.abs(topPosition-.38)*18);
       const avgHeight=group.reduce((sum,x)=>sum+x.height,0)/group.length;
-      score+=Math.max(-5,Math.min(18,(avgHeight/typicalH-1)*10));
+      score+=Math.max(-8,Math.min(30,(avgHeight/typicalH-1)*18));
       const confidence=group.reduce((sum,x)=>sum+x.confidence,0)/group.length;
       score+=Math.max(-12,Math.min(10,(confidence-60)*.25));
       if(group.length>1)score+=Math.min(25,(group.length-1)*7);
@@ -208,41 +210,62 @@ async function pdfText(file){
   if(!window.pdfjsLib)throw Error('PDF.js fehlt');
   const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
   let out='',priority=[];
-  try{
-    const meta=await pdf.getMetadata();
-    const title=meta?.info?.Title;
-    if(title&&title.trim())priority.push({text:title,boost:22,source:'PDF-Metadaten'});
-  }catch(_){/* Metadaten sind optional. */}
-  for(let n=1;n<=Math.min(pdf.numPages,10);n++){
+  // PDF-Metadaten sind häufig automatisch generisch und werden deshalb nur schwach gewichtet.
+  try{const meta=await pdf.getMetadata();const title=meta?.info?.Title;if(title&&title.trim()&&title.trim().length>8)priority.push({text:title,boost:5,source:'PDF-Metadaten'});}catch(_){}
+  for(let n=1;n<=Math.min(pdf.numPages,8);n++){
     const page=await pdf.getPage(n),content=await page.getTextContent(),items=content.items.filter(x=>x.str?.trim());
+    const view=page.view||[0,0,600,800],pageHeight=Math.max(1,view[3]-view[1]),pageWidth=Math.max(1,view[2]-view[0]);
     const rows=[];
     for(const item of items){
       const y=item.transform?.[5]||0,x=item.transform?.[4]||0,h=Math.abs(item.height||item.transform?.[3]||10);
-      let row=rows.find(r=>Math.abs(r.y-y)<Math.max(2,h*.45));
+      let row=rows.find(r=>Math.abs(r.y-y)<Math.max(2,h*.4));
       if(!row){row={y,items:[],height:h};rows.push(row)}
-      row.height=Math.max(row.height,h);row.items.push({x,text:item.str.trim(),height:h});
+      row.height=Math.max(row.height,h);row.items.push({x,text:item.str.trim(),height:h,width:item.width||0});
     }
     rows.sort((a,b)=>b.y-a.y);
-    const median=rows.map(r=>r.height).sort((a,b)=>a-b)[Math.floor(rows.length/2)]||10;
-    let previousY=null;
-    const pageLines=[];
+    const heights=rows.map(r=>r.height).sort((a,b)=>a-b),median=heights[Math.floor(heights.length/2)]||10;
+    let previousY=null,pageLines=[];
     for(const row of rows){
       const line=row.items.sort((a,b)=>a.x-b.x).map(x=>x.text).join(' ').replace(/\s+/g,' ').trim();
       if(!line)continue;
-      if(previousY!==null&&previousY-row.y>median*1.75)pageLines.push('');
+      if(previousY!==null&&previousY-row.y>median*1.8)pageLines.push('');
       pageLines.push(line);previousY=row.y;
     }
     out+='\n'+pageLines.join('\n');
-    // Große, im oberen Seitenbereich platzierte Zeilen sind starke Titelindikatoren.
-    const view=page.view||[0,0,600,800],pageHeight=Math.max(1,view[3]-view[1]);
-    const upperRows=rows.filter(r=>((r.y-view[1])/pageHeight)>.42&&r.height>=median*1.16).slice(0,8);
-    if(n===1&&upperRows.length){
-      let block=[];
-      for(const row of upperRows){
-        const line=row.items.sort((a,b)=>a.x-b.x).map(x=>x.text).join(' ').trim();
-        if(line)block.push(line);
+    if(n!==1)continue;
+    // Titelkandidaten werden aus Schriftgröße, Seitenposition und Zentrierung gebildet.
+    // Die allerobersten Zeilen werden ausdrücklich nicht pauschal bevorzugt.
+    const topRows=rows.filter(r=>{
+      const top=(view[3]-r.y)/pageHeight;
+      return top>.10&&top<.78&&r.height>=median*1.08;
+    });
+    for(let i=0;i<topRows.length;i++){
+      const group=[];
+      for(let j=i;j<Math.min(topRows.length,i+6);j++){
+        const row=topRows[j];
+        if(group.length){
+          const prev=group[group.length-1];
+          const gap=prev.y-row.y;
+          if(gap>Math.max(median*2.3,30))break;
+        }
+        group.push(row);
+        const lineTexts=group.map(r=>r.items.sort((a,b)=>a.x-b.x).map(x=>x.text).join(' ').trim());
+        const joined=joinTitleLines(lineTexts);
+        const quality=titleQuality(joined);
+        if(quality<0)continue;
+        const avgHeight=group.reduce((sum,r)=>sum+r.height,0)/group.length;
+        const top=(view[3]-group[0].y)/pageHeight;
+        const xMin=Math.min(...group.flatMap(r=>r.items.map(x=>x.x)));
+        const xMax=Math.max(...group.flatMap(r=>r.items.map(x=>x.x+x.width)));
+        const center=(xMin+xMax)/2;
+        let score=quality;
+        score+=Math.max(-8,Math.min(34,(avgHeight/median-1)*22));
+        if(top<.16)score-=17;else if(top<.7)score+=Math.max(0,13-Math.abs(top-.38)*20);
+        score+=Math.max(-4,10-Math.abs(center-(view[0]+pageWidth/2))/pageWidth*24);
+        if(group.length>1)score+=Math.min(20,(group.length-1)*5);
+        if(joined.split(/\s+/).length>24)score-=10;
+        priority.push({text:joined,boost:score-quality,source:'PDF-Schriftbild'});
       }
-      if(block.length)priority.push({text:joinTitleLines(block),boost:30,source:'PDF-Layout'});
     }
   }
   return {text:out,priority};
@@ -314,114 +337,67 @@ async function renderPDF(file,token){
   if(!window.pdfjsLib)throw Error('PDF.js konnte nicht geladen werden.');
   const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
   if(token!==modalToken)return;
-  $('modalBody').innerHTML='';
-  let pagesWithText=0,pagesWithoutText=0;
+  pdfPageTexts.clear();
+  $('modalBody').innerHTML='<div class="pdf-select-help">Zum zuverlässigen Markieren auf „Text dieser Seite auswählen“ tippen. Der Textbereich verhält sich wie normaler Text und bleibt beim Scrollen stabil. Danach kannst du markieren, kopieren oder den ganzen Seitentext kopieren.</div>';
   for(let n=1;n<=pdf.numPages;n++){
     if(token!==modalToken)return;
-    const page=await pdf.getPage(n);
-    const baseViewport=page.getViewport({scale:1});
+    const page=await pdf.getPage(n),baseViewport=page.getViewport({scale:1});
     const availableWidth=Math.max(260,Math.min(850,$('modalBody').clientWidth-34));
-    // Die PDF-Seite wird in CSS-Pixeln passend zum Vorschaufenster gerendert.
-    const scale=Math.min(1.25,availableWidth/baseViewport.width);
-    const viewport=page.getViewport({scale});
-    const outputScale=Math.max(1,window.devicePixelRatio||1);
-    const wrapper=document.createElement('div');
-    wrapper.className='pdf-page-wrap';
-    wrapper.style.width=viewport.width+'px';
-    wrapper.style.maxWidth='100%';
-    const canvas=document.createElement('canvas');
-    canvas.className='pdf-page';
-    canvas.width=Math.ceil(viewport.width*outputScale);
-    canvas.height=Math.ceil(viewport.height*outputScale);
-    canvas.style.width='100%';
-    canvas.style.maxWidth='none';
-    canvas.style.margin='0';
-    const ctx=canvas.getContext('2d',{alpha:false});
-    ctx.setTransform(outputScale,0,0,outputScale,0,0);
-    wrapper.appendChild(canvas);
-    $('modalBody').appendChild(wrapper);
+    const scale=Math.min(1.25,availableWidth/baseViewport.width),viewport=page.getViewport({scale});
+    const outputScale=Math.max(1,window.devicePixelRatio||1),wrapper=document.createElement('div');
+    wrapper.className='pdf-page-wrap';wrapper.style.width=viewport.width+'px';wrapper.style.maxWidth='100%';
+    const canvas=document.createElement('canvas');canvas.className='pdf-page';
+    canvas.width=Math.ceil(viewport.width*outputScale);canvas.height=Math.ceil(viewport.height*outputScale);
+    canvas.style.width='100%';canvas.style.maxWidth='none';canvas.style.margin='0';
+    const ctx=canvas.getContext('2d',{alpha:false});ctx.setTransform(outputScale,0,0,outputScale,0,0);
+    wrapper.appendChild(canvas);$('modalBody').appendChild(wrapper);
     await page.render({canvasContext:ctx,viewport}).promise;
     if(token!==modalToken)return;
 
-    // PDF.js erzeugt eine unsichtbare, aber auswählbare Textebene.
-    // Damit kann der Nutzer Text mit Maus oder Touch markieren und kopieren.
-    const textContent=await page.getTextContent();
-    const textItems=(textContent.items||[]).filter(item=>item.str&&item.str.trim());
-    if(textItems.length&&typeof pdfjsLib.renderTextLayer==='function'){
-      const textLayer=document.createElement('div');
-      textLayer.className='pdf-text-layer textLayer';
-      textLayer.style.width=viewport.width+'px';
-      textLayer.style.height=viewport.height+'px';
-      wrapper.appendChild(textLayer);
-      const textDivs=[];
-      const renderTask=pdfjsLib.renderTextLayer({
-        textContent,
-        container:textLayer,
-        viewport,
-        textDivs,
-        enhanceTextSelection:true
-      });
-      if(renderTask&&renderTask.promise)await renderTask.promise;
-      pagesWithText++;
-    }else if(textItems.length){
-      // Fallback für Builds, die renderTextLayer nicht exportieren.
-      const textLayer=document.createElement('div');
-      textLayer.className='pdf-text-layer';
-      textLayer.style.width=viewport.width+'px';
-      textLayer.style.height=viewport.height+'px';
-      wrapper.appendChild(textLayer);
-      for(const item of textItems){
-        const tx=pdfjsLib.Util.transform(viewport.transform,item.transform);
-        const fontHeight=Math.hypot(tx[2],tx[3]);
-        const span=document.createElement('span');
-        span.textContent=item.str;
-        span.style.left=tx[4]+'px';
-        span.style.top=(tx[5]-fontHeight)+'px';
-        span.style.fontSize=fontHeight+'px';
-        span.style.height=fontHeight+'px';
-        span.style.transform='scaleX('+(item.width?Math.max(.1,(item.width*scale)/(Math.max(1,item.str.length*fontHeight*.5))):1)+')';
-        textLayer.appendChild(span);
-      }
-      pagesWithText++;
-    }else{
-      pagesWithoutText++;
-      // Bei gescannten PDFs existiert keine echte PDF-Textebene.
-      // OCR wird als auswählbare Textebene über das gerenderte Seitenbild gelegt.
-      if(window.Tesseract){
-        try{
-          const worker=await getOCRWorker();
-          const ocr=await worker.recognize(canvas);
-          const layer=document.createElement('div');
-          layer.className='pdf-text-layer';
-          layer.style.width=viewport.width+'px';
-          layer.style.height=viewport.height+'px';
-          wrapper.appendChild(layer);
-          const lines=(ocr.data?.lines||[]).filter(line=>line.text&&line.bbox);
-          for(const line of lines){
-            const span=document.createElement('span');
-            span.textContent=line.text;
-            span.style.left=(line.bbox.x0/outputScale)+'px';
-            span.style.top=(line.bbox.y0/outputScale)+'px';
-            span.style.width=((line.bbox.x1-line.bbox.x0)/outputScale)+'px';
-            span.style.height=Math.max(8,(line.bbox.y1-line.bbox.y0)/outputScale)+'px';
-            span.style.fontSize=Math.max(8,(line.bbox.y1-line.bbox.y0)/outputScale)+'px';
-            layer.appendChild(span);
-          }
-        }catch(ocrError){
-          console.warn('OCR-Textebene für PDF-Seite '+n+' nicht verfügbar:',ocrError);
-        }
-      }
+    const content=await page.getTextContent();
+    const rows=[];
+    for(const item of (content.items||[]).filter(x=>x.str&&x.str.trim())){
+      const y=item.transform?.[5]||0,x=item.transform?.[4]||0;
+      let row=rows.find(r=>Math.abs(r.y-y)<3);
+      if(!row){row={y,items:[]};rows.push(row)}
+      row.items.push({x,text:item.str});
     }
+    rows.sort((a,b)=>b.y-a.y);
+    let pageText=rows.map(r=>r.items.sort((a,b)=>a.x-b.x).map(x=>x.text).join(' ').replace(/\s+/g,' ').trim()).filter(Boolean).join('\n');
+    // Gescannten Seiten fehlt eine echte Textebene: OCR-Text wird ebenfalls als normaler Text angeboten.
+    if(!pageText.trim()&&window.Tesseract){
+      try{const worker=await getOCRWorker();const ocr=await worker.recognize(canvas);pageText=ocr.data?.text||'';}catch(err){console.warn('PDF-OCR:',err)}
+    }
+    pdfPageTexts.set(n,pageText);
+    const panel=document.createElement('details');panel.className='pdf-select-panel';
+    const summary=document.createElement('summary');summary.textContent='Text dieser Seite auswählen / kopieren';
+    const area=document.createElement('textarea');area.readOnly=true;area.spellcheck=false;
+    area.setAttribute('aria-label','Auswählbarer Text von PDF-Seite '+n);
+    area.value=pageText||'Auf dieser Seite konnte kein Text erkannt werden.';
+    area.rows=Math.max(5,Math.min(14,(pageText.split('\n').length||5)+1));
+    const row=document.createElement('div');row.className='pdf-copy-row';
+    const copy=document.createElement('button');copy.type='button';copy.className='pdf-copy-btn';copy.dataset.copyPdfPage=String(n);copy.textContent='Seitentext kopieren';
+    row.appendChild(copy);panel.append(summary,area,row);$('modalBody').appendChild(panel);
   }
   if(token!==modalToken)return;
-  let foot=pdf.numPages+(pdf.numPages===1?' Seite':' Seiten')+' · Text markieren und kopieren';
-  if(pagesWithoutText>0&&!window.Tesseract)foot+=' · Einige Seiten sind Scans ohne Textebene';
-  else if(pagesWithoutText>0)foot+=' · Scantext wird per OCR bereitgestellt';
-  $('modalFoot').textContent=foot;
+  $('modalFoot').textContent=pdf.numPages+(pdf.numPages===1?' Seite':' Seiten')+' · Text unter jeder Seite markieren und kopieren';
 }
 function showText(t,token){if(token!==modalToken)return;let el=document.createElement('div');el.className='preview-text';el.textContent=t||'Kein Textinhalt gefunden.';$('modalBody').replaceChildren(el)}
 function showDocument(html,token){if(token!==modalToken)return;let parsed=new DOMParser().parseFromString(html,'text/html'),allowed=new Set(['P','H1','H2','H3','H4','UL','OL','LI','TABLE','THEAD','TBODY','TR','TD','TH','STRONG','B','EM','I','U','BR','DIV','SPAN']);function clean(node){for(let child of Array.from(node.children)){if(!allowed.has(child.tagName))child.replaceWith(document.createTextNode(child.textContent||''));else{Array.from(child.attributes).forEach(a=>child.removeAttribute(a.name));clean(child)}}}clean(parsed.body);let d=document.createElement('div');d.className='doc-preview';d.innerHTML=parsed.body.innerHTML;$('modalBody').replaceChildren(d)}
 function showError(msg,token=modalToken){if(token!==modalToken)return;let el=document.createElement('div');el.className='error';el.textContent=msg;$('modalBody').replaceChildren(el)}
+$('modalBody').addEventListener('click',async e=>{
+  const button=e.target.closest('[data-copy-pdf-page]');if(!button)return;
+  const pageNumber=Number(button.dataset.copyPdfPage),text=pdfPageTexts.get(pageNumber)||'';
+  if(!text.trim()){button.textContent='Kein Text vorhanden';return;}
+  let copied=false;
+  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);copied=true;}}catch(_){/* Fallback unten */}
+  if(!copied){
+    const area=button.closest('.pdf-select-panel')?.querySelector('textarea');
+    if(area){area.focus();area.select();area.setSelectionRange(0,area.value.length);try{copied=document.execCommand('copy')}catch(_){copied=false}}
+  }
+  button.textContent=copied?'Kopiert ✓':'Text markieren und manuell kopieren';
+  setTimeout(()=>{if(button.isConnected)button.textContent='Seitentext kopieren'},1800);
+});
 
 async function downloadBlob(blob,name){let url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.style.display='none';document.body.append(a);a.click();a.remove();let ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(ios){let token=openModal('Datei speichern',name+' · iOS/Safari');let msg=document.createElement('p');msg.className='preview-text';msg.textContent='Wenn der Download nicht automatisch startet, tippe auf den Link. In Safari kannst du anschließend über „Teilen“ → „In Dateien sichern“ speichern.';let link=document.createElement('a');link.className='download-link';link.href=url;link.target='_blank';link.rel='noopener';link.download=name;link.textContent='Datei öffnen / speichern';$('modalBody').replaceChildren(msg,link)}else setTimeout(()=>URL.revokeObjectURL(url),120000)}
 async function downloadOne(f){try{await downloadBlob(f.file,outputName(f));setStatus(f,'Download ausgelöst.')}catch(err){console.error(err);setStatus(f,'Download fehlgeschlagen: '+err.message);alert('Download fehlgeschlagen: '+err.message)}}
