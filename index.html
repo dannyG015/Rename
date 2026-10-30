@@ -33,7 +33,7 @@ if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudfl
 const $=id=>document.getElementById(id);let files=[],serial=1,ocrWorkerPromise=null,modalToken=0;
 const icons={eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg>',trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m5-6v6"/></svg>'};
 const extOf=n=>{let i=n.lastIndexOf('.');return i>0?n.slice(i+1).toLowerCase():''};const baseOf=n=>{let i=n.lastIndexOf('.');return i>0?n.slice(0,i):n};
-function safeName(s){return String(s||'').replace(/[<>:"/\\|?*\x00-\x1F]/g,' ').replace(/\s+/g,' ').replace(/[. ]+$/g,'').trim().slice(0,160)||'Dokument'}
+function safeName(s){return String(s||'').replace(/[<>:"/\\|?*\x00-\x1F]/g,' ').replace(/\s+/g,' ').replace(/[. ]+$/g,'').trim().slice(0,220)||'Dokument'}
 function outputName(f){let e=extOf(f.file.name);return safeName(f.title)+(e?'.'+e:'')}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function setStatus(f,msg){f.status=msg;let el=document.querySelector(`[data-status="${f.id}"]`);if(el)el.textContent=msg}
@@ -45,12 +45,192 @@ $('list').addEventListener('input',e=>{let input=e.target.closest('[data-name]')
 $('list').addEventListener('click',async e=>{let b=e.target.closest('button[data-act]');if(!b)return;let f=files.find(x=>x.id===Number(b.dataset.id));if(!f)return;if(b.dataset.act==='delete'){files=files.filter(x=>x.id!==f.id);render()}else if(b.dataset.act==='preview')await preview(f);else if(b.dataset.act==='download')await downloadOne(f)});
 $('clear').addEventListener('click',()=>{if(!files.length)return;if(confirm('Möchtest du wirklich alle Dateien aus der Liste entfernen?')){files=[];render();closeModal()}});
 function normalizeText(t){return String(t||'').replace(/\u0000/g,'').replace(/\r/g,'\n').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim()}
-function titleFromText(text,fallback){let lines=normalizeText(text).split('\n').map(x=>x.trim()).filter(Boolean).slice(0,100);let ranked=lines.map((line,i)=>{let words=line.split(/\s+/);let score=0;if(line.length<4||line.length>125)return{line,score:-999};if(/^(seite|page|slide|folie)\s*\d*$/i.test(line))return{line,score:-999};if(/^(microsoft (word|excel|powerpoint)|document|untitled)$/i.test(line))return{line,score:-999};score+=words.length>=2&&words.length<=12?20:0;score+=/[A-ZÄÖÜ]/.test(line)?8:0;score+=line.length>=12&&line.length<=85?12:0;score-=/[.!?]$/.test(line)?4:0;score+=Math.max(0,12-i);return{line,score}}).sort((a,b)=>b.score-a.score);return ranked[0]?.score>5?ranked[0].line:fallback}
-async function getOCRWorker(){if(!window.Tesseract)throw Error('OCR-Bibliothek nicht geladen');if(!ocrWorkerPromise)ocrWorkerPromise=Tesseract.createWorker('deu+eng',1,{logger:m=>{if(m.status==='recognizing text'){/* progress available */}}});return ocrWorkerPromise}
-async function ocrImage(file){let worker=await getOCRWorker();let result=await worker.recognize(file);return result.data.text||''}
-async function pdfText(file){if(!window.pdfjsLib)throw Error('PDF.js fehlt');let pdf=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;let out='';for(let n=1;n<=Math.min(pdf.numPages,5);n++){let page=await pdf.getPage(n),c=await page.getTextContent();let rows=c.items.filter(x=>x.str?.trim()).sort((a,b)=>(b.transform?.[5]||0)-(a.transform?.[5]||0));out+='\n'+rows.map(x=>x.str).join('\n')}return out}
-async function pptxText(file){let zip=await JSZip.loadAsync(file),names=Object.keys(zip.files).filter(x=>/^ppt\/slides\/slide\d+\.xml$/i.test(x)).sort((a,b)=>Number(a.match(/slide(\d+)/i)[1])-Number(b.match(/slide(\d+)/i)[1]));let out='';for(let n of names.slice(0,10)){let xml=await zip.files[n].async('text'),doc=new DOMParser().parseFromString(xml,'text/xml');out+='\n'+Array.from(doc.getElementsByTagName('a:t')).map(x=>x.textContent).join(' ')}return out}
-async function analyze(f){let e=extOf(f.file.name),text='';try{if(e==='pdf')text=await pdfText(f.file);else if(e==='docx')text=(await mammoth.extractRawText({arrayBuffer:await f.file.arrayBuffer()})).value;else if(e==='xlsx'||e==='xls'){let wb=XLSX.read(await f.file.arrayBuffer(),{type:'array'});text=wb.SheetNames.join('\n');for(let s of wb.SheetNames.slice(0,3))text+='\n'+XLSX.utils.sheet_to_csv(wb.Sheets[s]).slice(0,7000)}else if(e==='pptx')text=await pptxText(f.file);else if(e==='txt')text=await f.file.text();else if(['png','jpg','jpeg','webp'].includes(e)){setStatus(f,'Bild wird per OCR auf Text untersucht …');text=await ocrImage(f.file)}}catch(err){console.warn('Analyse:',err);setStatus(f,'Automatische Erkennung nicht möglich – Dateiname manuell bearbeiten.');f.ready=true;return}f.text=normalizeText(text);let suggestion=titleFromText(f.text,'');if(suggestion){if(!f.edited)f.title=suggestion;setStatus(f,'Titel/Text erkannt – Dateiname kann bearbeitet werden.')}else if(['png','jpg','jpeg','webp'].includes(e)){if(!f.edited)f.title='Bild_'+new Date().toISOString().slice(0,10)+'_'+String(f.id).padStart(3,'0');setStatus(f,'Kein lesbarer Text erkannt – neutraler Bildname vorgeschlagen.')}else setStatus(f,'Analyse abgeschlossen – Dateiname bei Bedarf bearbeiten.');f.ready=true;let input=document.querySelector(`[data-name="${f.id}"]`);if(input&&!f.edited&&document.activeElement!==input)input.value=f.title}
+
+/* -------------------------------------------------------
+   VERSTÄRKTE TITELERKENNUNG
+   - bewertet vollständige mehrzeilige Überschriften
+   - berücksichtigt Position, Zeilenhöhe und OCR-Konfidenz
+   - bevorzugt echte Überschriften statt einzelner Wörter
+   - entfernt typische Kopf-/Fußzeilen und Metadaten
+------------------------------------------------------- */
+const TITLE_STOP=/^(seite\s*\d+|page\s*\d+|slide\s*\d+|folie\s*\d+|inhaltsverzeichnis|table of contents|inhalt|contents|anhang|appendix|microsoft (word|excel|powerpoint)|document|untitled|scan\s*\d*|img[_ -]?\d+)$/i;
+const GENERIC_STOP=/^(datum|date|name|nummer|nr\.?|rechnungsnummer|kundennummer|bestellnummer|auftragsnummer|referenz|version|erstellt am|stand|status|vertraulich|confidential|www\.|https?:\/\/|sehr geehrte|guten tag|hallo|liebe[rs]? )/i;
+function titleQuality(raw){
+  const text=normalizeText(raw).replace(/\s*([,:;])\s*/g,'$1 ').trim();
+  const len=[...text].length, words=text.split(/\s+/).filter(Boolean);
+  if(len<5||len>240||words.length>32)return -1000;
+  if(TITLE_STOP.test(text)||GENERIC_STOP.test(text))return -1000;
+  if(/^[\d\W_]+$/.test(text)||/^[A-Z0-9_-]{1,8}$/.test(text))return -1000;
+  if(/^(tel\.?|telefon|fax|e-?mail|email|straße|str\.|plz|ust-?id)/i.test(text))return -1000;
+  let score=0;
+  if(words.length>=2)score+=17;
+  if(words.length>=3&&words.length<=14)score+=10;
+  if(len>=14&&len<=110)score+=15;
+  else if(len>110&&len<=190)score+=8;
+  if(/[A-ZÄÖÜ]/.test(text))score+=5;
+  if(/^[A-ZÄÖÜ0-9][^.!?]{4,}$/.test(text))score+=3;
+  if(/\b(bericht|analyse|konzept|anleitung|protokoll|projekt|angebot|rechnung|vertrag|studie|manual|report|proposal|specification|documentation)\b/i.test(text))score+=5;
+  if(/[.!?]$/.test(text))score-=9;
+  if(/[,;:]$/.test(text))score-=3;
+  if(words.length===1){score-=12;if(/^(rechnung|angebot|vertrag|bericht|protokoll|bescheinigung|zertifikat|lebenslauf|bewerbung|zeugnis|antrag|quittung|invoice|receipt|certificate|resume)$/i.test(text))score+=20;}
+  if(words.length>22)score-=20;
+  return score;
+}
+function makeTextCandidates(text){
+  const lines=normalizeText(text).split('\n').map(x=>x.trim()).filter(Boolean).slice(0,180);
+  const out=[];
+  for(let i=0;i<lines.length;i++){
+    for(let count=1;count<=4&&i+count<=lines.length;count++){
+      const group=lines.slice(i,i+count);
+      // Eine mehrzeilige Überschrift darf keine ganzen Fließtextabsätze verbinden.
+      if(group.some(x=>x.length>125||/[.!?,;:]$/.test(x)||GENERIC_STOP.test(x)))break;
+      const joined=group.join(' ').replace(/\s+/g,' ').trim();
+      let score=titleQuality(joined);
+      if(score<0)continue;
+      score+=Math.max(0,18-i*1.15);
+      if(count>1)score+=Math.min(13,(count-1)*5);
+      if(group.every(x=>x.length<65))score+=4;
+      if(group.length>1&&group.some(x=>x.length<3))score-=8;
+      out.push({text:joined,score,source:'text'});
+    }
+  }
+  return out;
+}
+function makeOcrCandidates(lines){
+  if(!Array.isArray(lines)||!lines.length)return [];
+  const clean=lines.map((line,index)=>{
+    const box=line.bbox||{};
+    const x0=Number(box.x0??line.x0??0),y0=Number(box.y0??line.y0??index*20);
+    const x1=Number(box.x1??line.x1??x0+Math.max(10,String(line.text||'').length*8));
+    const y1=Number(box.y1??line.y1??y0+18);
+    return {text:normalizeText(line.text),x0,y0,x1,y1,height:Math.max(1,y1-y0),confidence:Number(line.confidence??line.conf??75),block:line.block_num??line.blockNum??null,paragraph:line.par_num??line.parNum??null};
+  }).filter(x=>x.text).sort((a,b)=>a.y0-b.y0||a.x0-b.x0);
+  if(!clean.length)return [];
+  const maxY=Math.max(...clean.map(x=>x.y1)),minY=Math.min(...clean.map(x=>x.y0)),pageH=Math.max(1,maxY-minY);
+  const typicalH=clean.map(x=>x.height).sort((a,b)=>a-b)[Math.floor(clean.length/2)]||16;
+  const out=[];
+  for(let i=0;i<clean.length;i++){
+    let group=[];
+    for(let j=i;j<Math.min(clean.length,i+4);j++){
+      const current=clean[j];
+      if(j>i){
+        const prev=clean[j-1],gap=current.y0-prev.y1;
+        const aligned=Math.abs(current.x0-prev.x0)<Math.max(55,typicalH*3.2);
+        const sameBlock=current.block!==null&&prev.block!==null&&current.block===prev.block;
+        if(gap>Math.max(typicalH*1.9,30)||(!aligned&&!sameBlock))break;
+      }
+      group.push(current);
+      const joined=group.map(x=>x.text).join(' ').replace(/\s+/g,' ').trim();
+      let score=titleQuality(joined);
+      if(score<0)continue;
+      const topPosition=1-((group[0].y0-minY)/pageH);
+      score+=Math.max(-5,Math.min(20,topPosition*20));
+      const avgHeight=group.reduce((sum,x)=>sum+x.height,0)/group.length;
+      score+=Math.max(-5,Math.min(14,(avgHeight/typicalH-1)*8));
+      const confidence=group.reduce((sum,x)=>sum+x.confidence,0)/group.length;
+      score+=Math.max(-10,Math.min(8,(confidence-65)*0.22));
+      if(group.length>1)score+=Math.min(15,(group.length-1)*6);
+      const centerX=(Math.min(...group.map(x=>x.x0))+Math.max(...group.map(x=>x.x1)))/2;
+      const pageCenter=(Math.min(...clean.map(x=>x.x0))+Math.max(...clean.map(x=>x.x1)))/2;
+      if(Math.abs(centerX-pageCenter)<Math.max(40,typicalH*4))score+=3;
+      out.push({text:joined,score,source:'ocr',top:topPosition});
+    }
+  }
+  return out;
+}
+function titleFromText(text,fallback='',ocrLines=[]){
+  const candidates=[...makeTextCandidates(text),...makeOcrCandidates(ocrLines)];
+  if(!candidates.length)return fallback;
+  // Fast-Duplikate entfernen und den besten vollständigen Titel wählen.
+  const unique=new Map();
+  for(const c of candidates){const key=c.text.toLocaleLowerCase('de-DE');const old=unique.get(key);if(!old||c.score>old.score)unique.set(key,c)}
+  const ranked=[...unique.values()].sort((a,b)=>b.score-a.score);
+  const best=ranked[0];
+  // Nur bei ausreichender Evidenz automatisch umbenennen.
+  return best&&best.score>=25?best.text:fallback;
+}
+
+async function getOCRWorker(){
+  if(!window.Tesseract)throw Error('OCR-Bibliothek nicht geladen');
+  if(!ocrWorkerPromise)ocrWorkerPromise=Tesseract.createWorker('deu+eng',1,{logger:m=>{if(m.status==='recognizing text'){/* OCR-Fortschritt */}}});
+  return ocrWorkerPromise;
+}
+async function ocrImage(file){
+  const worker=await getOCRWorker();
+  const result=await worker.recognize(file);
+  const data=result.data||{};
+  const lines=[];
+  // Tesseract liefert Zeilen mit Begrenzungsrahmen. Diese Geometrie
+  // wird genutzt, damit mehrzeilige Überschriften zusammenbleiben.
+  for(const block of (data.blocks||[]))for(const paragraph of (block.paragraphs||[]))for(const line of (paragraph.lines||[])){
+    const text=(line.words||[]).map(w=>w.text).join(' ').trim()||line.text||'';
+    if(text)lines.push({text,bbox:line.bbox,confidence:line.confidence??data.confidence,block_num:block.block_num,par_num:paragraph.par_num});
+  }
+  if(!lines.length&&Array.isArray(data.lines))for(const line of data.lines)lines.push({text:line.text,bbox:line.bbox,confidence:line.confidence});
+  return {text:data.text||lines.map(x=>x.text).join('\n'),lines};
+}
+async function pdfText(file){
+  if(!window.pdfjsLib)throw Error('PDF.js fehlt');
+  const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+  let out='';
+  for(let n=1;n<=Math.min(pdf.numPages,8);n++){
+    const page=await pdf.getPage(n),content=await page.getTextContent(),items=content.items.filter(x=>x.str?.trim());
+    const rows=[];
+    for(const item of items){
+      const y=item.transform?.[5]||0,x=item.transform?.[4]||0;
+      let row=rows.find(r=>Math.abs(r.y-y)<Math.max(2,(item.height||10)*.45));
+      if(!row){row={y,items:[]};rows.push(row)}
+      row.items.push({x,text:item.str.trim()});
+    }
+    rows.sort((a,b)=>b.y-a.y);
+    out+='\n'+rows.map(r=>r.items.sort((a,b)=>a.x-b.x).map(x=>x.text).join(' ').trim()).filter(Boolean).join('\n');
+  }
+  return out;
+}
+async function pptxText(file){
+  let zip=await JSZip.loadAsync(file),names=Object.keys(zip.files).filter(x=>/^ppt\/slides\/slide\d+\.xml$/i.test(x)).sort((a,b)=>Number(a.match(/slide(\d+)/i)[1])-Number(b.match(/slide(\d+)/i)[1]));
+  let out='';
+  for(let n of names.slice(0,12)){
+    let xml=await zip.files[n].async('text'),doc=new DOMParser().parseFromString(xml,'text/xml');
+    const shapes=Array.from(doc.getElementsByTagName('p:sp'));
+    let slideLines=[];
+    for(const shape of shapes){
+      const ph=shape.getElementsByTagName('p:ph')[0],type=ph?.getAttribute('type')||'';
+      const paragraphs=Array.from(shape.getElementsByTagName('a:p')).map(p=>Array.from(p.getElementsByTagName('a:t')).map(t=>t.textContent).join('').trim()).filter(Boolean);
+      if(paragraphs.length){if(/title|ctrTitle/i.test(type))slideLines.unshift(...paragraphs);else slideLines.push(...paragraphs)}
+    }
+    out+='\n'+slideLines.join('\n');
+  }
+  return out;
+}
+async function analyze(f){
+  const e=extOf(f.file.name);let text='',ocrLines=[];
+  try{
+    if(e==='pdf')text=await pdfText(f.file);
+    else if(e==='docx')text=(await mammoth.extractRawText({arrayBuffer:await f.file.arrayBuffer()})).value;
+    else if(e==='xlsx'||e==='xls'){
+      const wb=XLSX.read(await f.file.arrayBuffer(),{type:'array'});
+      const metadata=[wb.Props?.Title,wb.Props?.Subject].filter(Boolean);
+      text=metadata.join('\n')+'\n'+wb.SheetNames.join('\n');
+      for(let s of wb.SheetNames.slice(0,4))text+='\n'+XLSX.utils.sheet_to_csv(wb.Sheets[s]).slice(0,12000);
+    }else if(e==='pptx')text=await pptxText(f.file);
+    else if(e==='txt')text=await f.file.text();
+    else if(['png','jpg','jpeg','webp'].includes(e)){
+      setStatus(f,'Bild wird per OCR vollständig analysiert …');
+      const result=await ocrImage(f.file);text=result.text;ocrLines=result.lines;
+    }
+  }catch(err){console.warn('Analyse:',err);setStatus(f,'Automatische Erkennung nicht möglich – Dateiname manuell bearbeiten.');f.ready=true;return}
+  f.text=normalizeText(text);
+  const suggestion=titleFromText(f.text,'',ocrLines);
+  if(suggestion){if(!f.edited)f.title=suggestion;setStatus(f,'Vollständiger Titel erkannt – Dateiname kann bearbeitet werden.')}
+  else if(['png','jpg','jpeg','webp'].includes(e)){
+    if(!f.edited)f.title='Bild_'+new Date().toISOString().slice(0,10)+'_'+String(f.id).padStart(3,'0');
+    setStatus(f,'Kein sicherer Titel erkannt – neutraler Bildname vorgeschlagen.');
+  }else setStatus(f,'Kein eindeutiger Titel erkannt – Dateiname bitte prüfen.');
+  f.ready=true;
+  const input=document.querySelector(`[data-name="${f.id}"]`);
+  if(input&&!f.edited&&document.activeElement!==input)input.value=f.title;
+}
 
 function openModal(title,foot='Vorschau'){modalToken++;$('modalTitle').textContent=title;$('modalFoot').textContent=foot;$('modalBody').innerHTML='<div class="loading">Lade Inhalt …</div>';$('overlay').style.display='flex';requestAnimationFrame(()=>$('overlay').classList.add('open'));document.body.style.overflow='hidden';return modalToken}
 function closeModal(){modalToken++;$('overlay').classList.remove('open');document.body.style.overflow='';setTimeout(()=>{if(!$('overlay').classList.contains('open')){$('overlay').style.display='none';$('modalBody').innerHTML=''}},200)}
