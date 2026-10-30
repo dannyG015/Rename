@@ -1,0 +1,1276 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17191d">
+<title>Smart File Renamer</title>
+
+<!-- Bibliotheken -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+:root {
+  --bg: #111317;
+  --panel: #1b1e24;
+  --panel2: #22262e;
+  --border: #303640;
+  --text: #f2f4f7;
+  --muted: #9ba3af;
+  --accent: #e5e7eb;
+  --green: #54c58a;
+  --red: #ef7777;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button, input { font: inherit; }
+
+button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app {
+  width: min(1100px, 94%);
+  margin: 0 auto;
+  padding: 34px 0 70px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+h1 {
+  font-size: clamp(25px, 5vw, 36px);
+  margin: 0 0 7px;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.header-tag {
+  color: #b9c0ca;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 8px 13px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.upload-area {
+  border: 1.5px dashed #4a515d;
+  border-radius: 17px;
+  background: #191c22;
+  padding: 38px 20px;
+  text-align: center;
+  transition: .2s;
+  cursor: pointer;
+}
+
+.upload-area.dragover {
+  border-color: #d5dae2;
+  background: #252a32;
+}
+
+.upload-icon {
+  font-size: 34px;
+  margin-bottom: 12px;
+}
+
+.upload-area h2 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.upload-area p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 18px;
+}
+
+.primary-btn, .secondary-btn, .danger-btn {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 17px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.primary-btn {
+  background: #e8ebef;
+  color: #17191d;
+}
+
+.secondary-btn {
+  background: #303640;
+  color: var(--text);
+}
+
+.danger-btn {
+  background: #48282c;
+  color: #ffb8b8;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 28px 0 15px;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolbar h2 {
+  font-size: 17px;
+  margin: 0;
+}
+
+.counter {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.file-list {
+  display: grid;
+  gap: 12px;
+}
+
+.file-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.file-main { min-width: 0; }
+
+.file-original {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 9px;
+  overflow-wrap: anywhere;
+}
+
+.file-input {
+  width: 100%;
+  min-width: 0;
+  background: #111419;
+  color: var(--text);
+  border: 1px solid #424a56;
+  border-radius: 8px;
+  padding: 10px 11px;
+  outline: none;
+}
+
+.file-input:focus {
+  border-color: #c7cdd6;
+  box-shadow: 0 0 0 2px #c7cdd622;
+}
+
+.file-status {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 7px;
+  min-height: 14px;
+}
+
+.file-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.icon-btn {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel2);
+  color: #e8ebef;
+}
+
+.icon-btn:active { transform: scale(.95); }
+.icon-btn svg { width: 18px; height: 18px; }
+.icon-btn.delete { color: #ff9292; }
+
+.empty-state {
+  text-align: center;
+  padding: 38px 15px;
+  border: 1px dashed var(--border);
+  border-radius: 13px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.progress-wrap {
+  height: 4px;
+  background: #303640;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 20px;
+  display: none;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: #dce1e8;
+  transition: width .2s;
+}
+
+.notice {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Vorschau- und Download-Dialog */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  background: #080a0dcc;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+.overlay.visible {
+  display: flex;
+  opacity: 1;
+}
+
+.modal {
+  width: min(950px, 100%);
+  height: min(88vh, 850px);
+  background: #191c22;
+  border: 1px solid #3b424d;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 90px #0009;
+  transform: translateY(12px) scale(.99);
+  transition: transform .2s ease;
+}
+
+.overlay.visible .modal {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  padding: 14px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: #303640;
+  color: white;
+  font-size: 22px;
+}
+
+.modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.preview-page {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto 18px;
+  background: white;
+  box-shadow: 0 3px 15px #0005;
+}
+
+.preview-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+  color: #e4e7eb;
+  font-size: 14px;
+}
+
+.preview-html {
+  background: white;
+  color: #17191d;
+  padding: 22px;
+  border-radius: 7px;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+.preview-html img { max-width: 100%; }
+
+.preview-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+  object-fit: contain;
+}
+
+.preview-loading, .preview-error {
+  color: var(--muted);
+  text-align: center;
+  padding: 45px 15px;
+  line-height: 1.6;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.download-link {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 9px;
+  background: #e8ebef;
+  color: #17191d;
+  text-decoration: none;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .app { padding-top: 24px; }
+  header { align-items: flex-start; }
+  .header-tag { display: none; }
+  .file-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .file-actions { justify-content: flex-end; }
+  .toolbar { align-items: flex-start; }
+  .toolbar-actions { width: 100%; }
+  .toolbar-actions button { flex: 1; }
+  .modal { height: 92vh; }
+  .overlay { padding: 8px; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Smart File Renamer</h1>
+      <div class="subtitle">Dateien analysieren, sinnvoll benennen und herunterladen.</div>
+    </div>
+    <div class="header-tag">100 % lokale Verarbeitung</div>
+  </header>
+
+  <section class="upload-area" id="dropArea">
+    <div class="upload-icon">↥</div>
+    <h2>Dateien hier ablegen</h2>
+    <p>PDF, DOCX, XLSX, XLS, PPTX, TXT und Bilder</p>
+    <button class="primary-btn" id="selectFilesBtn" type="button">Dateien auswählen</button>
+    <input id="fileInput" type="file" multiple hidden
+      accept=".pdf,.docx,.xlsx,.xls,.pptx,.txt,.png,.jpg,.jpeg,.webp">
+  </section>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <h2>Deine Dateien</h2>
+      <span class="counter" id="counter">0 Dateien</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="secondary-btn" id="zipBtn" type="button">↓ ZIP herunterladen</button>
+      <button class="danger-btn" id="clearBtn" type="button">Alle löschen</button>
+    </div>
+  </div>
+
+  <div class="file-list" id="fileList">
+    <div class="empty-state">Noch keine Dateien hinzugefügt.</div>
+  </div>
+
+  <div class="notice">
+    Deine Dateien werden im Browser verarbeitet. Für die Erkennung und Vorschau
+    müssen die verwendeten Bibliotheken einmalig aus dem Internet geladen werden.
+  </div>
+</div>
+
+<!-- Vorschau / Download-Fallback -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Vorschau</div>
+      <button class="close-btn" id="closeModal" type="button" aria-label="Schließen">×</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div class="preview-loading">Lade Inhalt …</div>
+    </div>
+    <div class="modal-footer" id="modalFooter">
+      Vorschau
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* -------------------------------------------------------
+   GRUNDEINSTELLUNGEN
+------------------------------------------------------- */
+
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+}
+
+const $ = (id) => document.getElementById(id);
+
+const fileInput = $("fileInput");
+const dropArea = $("dropArea");
+const fileList = $("fileList");
+const counter = $("counter");
+const overlay = $("overlay");
+const modalBody = $("modalBody");
+const modalTitle = $("modalTitle");
+const modalFooter = $("modalFooter");
+
+let entries = [];
+let currentPreviewUrl = null;
+let nextId = 1;
+
+const ICONS = {
+  eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m-5-5 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/></svg>'
+};
+
+const SUPPORTED = [
+  "pdf", "docx", "xlsx", "xls", "pptx", "txt",
+  "png", "jpg", "jpeg", "webp"
+];
+
+/* -------------------------------------------------------
+   DATEIEN UND DATEINAMEN
+------------------------------------------------------- */
+
+function getExtension(name) {
+  const index = name.lastIndexOf(".");
+  return index > 0 ? name.slice(index + 1).toLowerCase() : "";
+}
+
+function getBaseName(name) {
+  const index = name.lastIndexOf(".");
+  return index > 0 ? name.slice(0, index) : name;
+}
+
+function sanitizeFilename(name) {
+  return String(name || "")
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/[. ]+$/g, "")
+    .trim()
+    .slice(0, 180);
+}
+
+function makeFilename(entry) {
+  const extension = getExtension(entry.originalName);
+  const clean = sanitizeFilename(entry.title) || "Dokument";
+  return extension ? clean + "." + extension : clean;
+}
+
+function setStatus(entry, message) {
+  entry.status = message;
+  const statusElement = document.querySelector(
+    '[data-status-id="' + entry.id + '"]'
+  );
+  if (statusElement) statusElement.textContent = message;
+}
+
+function addFiles(fileCollection) {
+  const files = Array.from(fileCollection || []);
+  const accepted = [];
+
+  for (const file of files) {
+    const extension = getExtension(file.name);
+
+    if (!SUPPORTED.includes(extension)) {
+      alert("Dateityp nicht unterstützt: " + file.name);
+      continue;
+    }
+
+    const entry = {
+      id: nextId++,
+      file,
+      originalName: file.name,
+      title: getBaseName(file.name),
+      status: "Wird analysiert …",
+      text: "",
+      previewHtml: "",
+      isReady: false
+    };
+
+    entries.push(entry);
+    accepted.push(entry);
+  }
+
+  renderFiles();
+  updateCounter();
+
+  accepted.forEach((entry) => analyzeFile(entry));
+}
+
+/* -------------------------------------------------------
+   RENDERING
+   Wichtig: Die Dateiliste wird NICHT bei jeder Eingabe
+   neu aufgebaut. Dadurch bleibt das Eingabefeld stabil.
+------------------------------------------------------- */
+
+function renderFiles() {
+  if (entries.length === 0) {
+    fileList.innerHTML = '<div class="empty-state">Noch keine Dateien hinzugefügt.</div>';
+    updateCounter();
+    return;
+  }
+
+  fileList.innerHTML = entries.map((entry) => `
+    <article class="file-card" data-card-id="${entry.id}">
+      <div class="file-main">
+        <div class="file-original">${escapeHtml(entry.originalName)}</div>
+        <input
+          class="file-input"
+          type="text"
+          value="${escapeAttribute(entry.title)}"
+          data-title-id="${entry.id}"
+          aria-label="Neuen Dateinamen eingeben"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <div class="file-status" data-status-id="${entry.id}">
+          ${escapeHtml(entry.status)}
+        </div>
+      </div>
+
+      <div class="file-actions">
+        <button class="icon-btn" type="button" data-action="preview"
+          data-id="${entry.id}" aria-label="Vorschau" title="Vorschau">
+          ${ICONS.eye}
+        </button>
+        <button class="icon-btn" type="button" data-action="download"
+          data-id="${entry.id}" aria-label="Herunterladen" title="Herunterladen">
+          ${ICONS.download}
+        </button>
+        <button class="icon-btn delete" type="button" data-action="delete"
+          data-id="${entry.id}" aria-label="Löschen" title="Löschen">
+          ${ICONS.trash}
+        </button>
+      </div>
+    </article>
+  `).join("");
+
+  updateCounter();
+}
+
+function updateCounter() {
+  counter.textContent = entries.length + (entries.length === 1 ? " Datei" : " Dateien");
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value);
+}
+
+/* -------------------------------------------------------
+   ECHTE EDITIERFUNKTION
+   input-Event speichert jeden Tastendruck direkt im Objekt.
+------------------------------------------------------- */
+
+fileList.addEventListener("input", (event) => {
+  const input = event.target.closest("[data-title-id]");
+  if (!input) return;
+
+  const id = Number(input.dataset.titleId);
+  const entry = entries.find((item) => item.id === id);
+
+  if (entry) {
+    entry.title = input.value;
+    entry.status = "Dateiname bearbeitet";
+    const status = document.querySelector('[data-status-id="' + id + '"]');
+    if (status) status.textContent = entry.status;
+  }
+});
+
+/* -------------------------------------------------------
+   BUTTON-AKTIONEN
+------------------------------------------------------- */
+
+fileList.addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+
+  const id = Number(button.dataset.id);
+  const action = button.dataset.action;
+  const entry = entries.find((item) => item.id === id);
+
+  if (!entry) return;
+
+  if (action === "delete") {
+    entries = entries.filter((item) => item.id !== id);
+    renderFiles();
+    return;
+  }
+
+  if (action === "preview") {
+    await openPreview(entry);
+    return;
+  }
+
+  if (action === "download") {
+    await downloadEntry(entry);
+  }
+});
+
+/* -------------------------------------------------------
+   ALLE LÖSCHEN
+------------------------------------------------------- */
+
+$("clearBtn").addEventListener("click", () => {
+  if (entries.length === 0) return;
+
+  const confirmed = confirm("Möchtest du wirklich alle Dateien löschen?");
+
+  if (!confirmed) return;
+
+  entries = [];
+  renderFiles();
+  updateCounter();
+  closeModal();
+});
+
+/* -------------------------------------------------------
+   DATEIEN AUSWÄHLEN / DRAG & DROP
+------------------------------------------------------- */
+
+$("selectFilesBtn").addEventListener("click", () => fileInput.click());
+
+dropArea.addEventListener("click", (event) => {
+  if (event.target.closest("button")) return;
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", (event) => {
+  addFiles(event.target.files);
+  fileInput.value = "";
+});
+
+dropArea.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  dropArea.classList.add("dragover");
+});
+
+dropArea.addEventListener("dragleave", () => {
+  dropArea.classList.remove("dragover");
+});
+
+dropArea.addEventListener("drop", (event) => {
+  event.preventDefault();
+  dropArea.classList.remove("dragover");
+  addFiles(event.dataTransfer.files);
+});
+
+/* -------------------------------------------------------
+   TITELERKENNUNG
+------------------------------------------------------- */
+
+function cleanExtractedText(text) {
+  return String(text || "")
+    .replace(/\u0000/g, "")
+    .replace(/\r/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function scoreTitle(line) {
+  const text = String(line || "").trim();
+
+  if (text.length < 4 || text.length > 150) return -100;
+  if (/^(seite|page|kapitel|chapter)\s+\d+$/i.test(text)) return -100;
+  if (/^(inhalt|contents|table of contents)$/i.test(text)) return -80;
+  if (/^(microsoft word|powerpoint|excel|document)$/i.test(text)) return -100;
+  if (/^https?:\/\//i.test(text)) return -80;
+  if (/^[\d\s.,-]+$/.test(text)) return -100;
+
+  let score = 0;
+  const words = text.split(/\s+/);
+
+  if (words.length >= 2 && words.length <= 12) score += 20;
+  if (words.length === 1) score += 3;
+  if (/[A-ZÄÖÜ]/.test(text)) score += 7;
+  if (/\d/.test(text)) score += 2;
+  if (/[.!?]$/.test(text)) score -= 5;
+  if (text.length >= 12 && text.length <= 90) score += 12;
+
+  return score;
+}
+
+function chooseTitle(text, fallback) {
+  const lines = cleanExtractedText(text)
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 80);
+
+  const candidates = lines
+    .map((line, index) => ({
+      line,
+      score: scoreTitle(line) + Math.max(0, 15 - index)
+    }))
+    .filter((candidate) => candidate.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return candidates.length ? candidates[0].line : fallback;
+}
+
+async function analyzeFile(entry) {
+  try {
+    const extension = getExtension(entry.originalName);
+    let extractedText = "";
+
+    if (extension === "pdf") {
+      extractedText = await extractPdfText(entry.file);
+    } else if (extension === "docx") {
+      const result = await mammoth.extractRawText({ arrayBuffer: await entry.file.arrayBuffer() });
+      extractedText = result.value || "";
+    } else if (extension === "xlsx" || extension === "xls") {
+      const workbook = XLSX.read(await entry.file.arrayBuffer(), { type: "array" });
+      extractedText = workbook.SheetNames.join("\n");
+
+      for (const sheetName of workbook.SheetNames.slice(0, 3)) {
+        const sheet = workbook.Sheets[sheetName];
+        extractedText += "\n" + XLSX.utils.sheet_to_csv(sheet).slice(0, 8000);
+      }
+    } else if (extension === "pptx") {
+      extractedText = await extractPptxText(entry.file);
+    } else if (extension === "txt") {
+      extractedText = await entry.file.text();
+    } else {
+      extractedText = "";
+    }
+
+    entry.text = cleanExtractedText(extractedText);
+
+    const recognized = chooseTitle(entry.text, "");
+    if (recognized && scoreTitle(recognized) > 0) {
+      entry.title = recognized;
+    }
+
+    entry.isReady = true;
+    setStatus(entry, recognized ? "Titel erkannt – du kannst ihn bearbeiten." : "Analyse abgeschlossen – Dateiname bei Bedarf bearbeiten.");
+
+    // Nur den Wert des zugehörigen Feldes aktualisieren.
+    // Kein vollständiges Neurendern der Liste.
+    const input = document.querySelector('[data-title-id="' + entry.id + '"]');
+    if (input && document.activeElement !== input) {
+      input.value = entry.title;
+    }
+
+  } catch (error) {
+    console.error("Analysefehler:", error);
+    entry.isReady = true;
+    setStatus(entry, "Analyse nicht vollständig möglich – Dateiname manuell eingeben.");
+  }
+}
+
+async function extractPdfText(file) {
+  if (!window.pdfjsLib) throw new Error("PDF.js konnte nicht geladen werden.");
+
+  const data = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjsLib.getDocument({ data }).promise;
+  let result = "";
+
+  // Für die Titelerkennung reichen die ersten Seiten normalerweise aus.
+  const pagesToRead = Math.min(pdf.numPages, 5);
+
+  for (let pageNumber = 1; pageNumber <= pagesToRead; pageNumber++) {
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+
+    const items = content.items
+      .filter((item) => item.str && item.str.trim())
+      .map((item) => ({
+        text: item.str.trim(),
+        y: item.transform ? item.transform[5] : 0
+      }));
+
+    // PDF-Koordinaten: höhere y-Werte liegen weiter oben auf der Seite.
+    items.sort((a, b) => b.y - a.y);
+    result += "\n" + items.map((item) => item.text).join("\n");
+  }
+
+  return result;
+}
+
+async function extractPptxText(file) {
+  if (!window.JSZip) throw new Error("JSZip konnte nicht geladen werden.");
+
+  const zip = await JSZip.loadAsync(file);
+  const slideFiles = Object.keys(zip.files)
+    .filter((name) => /^ppt\/slides\/slide\d+\.xml$/i.test(name))
+    .sort((a, b) => {
+      const numberA = Number(a.match(/slide(\d+)/i)[1]);
+      const numberB = Number(b.match(/slide(\d+)/i)[1]);
+      return numberA - numberB;
+    });
+
+  let result = "";
+
+  for (const slidePath of slideFiles.slice(0, 10)) {
+    const xml = await zip.files[slidePath].async("text");
+    const documentXml = new DOMParser().parseFromString(xml, "text/xml");
+    const textNodes = Array.from(documentXml.getElementsByTagName("a:t"));
+    result += "\n" + textNodes.map((node) => node.textContent).join(" ");
+  }
+
+  return result;
+}
+
+/* -------------------------------------------------------
+   VORSCHAU-MODAL
+------------------------------------------------------- */
+
+function showModal(title, footerText = "") {
+  modalTitle.textContent = title;
+  modalFooter.textContent = footerText;
+  modalBody.innerHTML = '<div class="preview-loading">Lade Inhalt …</div>';
+
+  overlay.style.display = "flex";
+  requestAnimationFrame(() => overlay.classList.add("visible"));
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  overlay.classList.remove("visible");
+  document.body.style.overflow = "";
+
+  setTimeout(() => {
+    if (!overlay.classList.contains("visible")) {
+      overlay.style.display = "none";
+      modalBody.innerHTML = "";
+    }
+  }, 220);
+
+  if (currentPreviewUrl) {
+    URL.revokeObjectURL(currentPreviewUrl);
+    currentPreviewUrl = null;
+  }
+}
+
+$("closeModal").addEventListener("click", closeModal);
+
+overlay.addEventListener("click", (event) => {
+  if (event.target === overlay) closeModal();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && overlay.classList.contains("visible")) {
+    closeModal();
+  }
+});
+
+async function openPreview(entry) {
+  const extension = getExtension(entry.originalName);
+  const filename = makeFilename(entry);
+
+  showModal(filename, "Dateivorschau");
+
+  try {
+    if (extension === "pdf") {
+      await renderPdfPreview(entry.file);
+      return;
+    }
+
+    if (["png", "jpg", "jpeg", "webp"].includes(extension)) {
+      const url = URL.createObjectURL(entry.file);
+      currentPreviewUrl = url;
+
+      const img = document.createElement("img");
+      img.className = "preview-image";
+      img.alt = filename;
+      img.src = url;
+
+      modalBody.innerHTML = "";
+      modalBody.appendChild(img);
+      return;
+    }
+
+    if (extension === "txt") {
+      const text = await entry.file.text();
+      showTextPreview(text);
+      return;
+    }
+
+    if (extension === "docx") {
+      const result = await mammoth.convertToHtml({
+        arrayBuffer: await entry.file.arrayBuffer()
+      });
+      showHtmlPreview(result.value || "<p>Kein Inhalt gefunden.</p>");
+      return;
+    }
+
+    if (extension === "xlsx" || extension === "xls") {
+      const workbook = XLSX.read(await entry.file.arrayBuffer(), { type: "array" });
+      const wrapper = document.createElement("div");
+
+      for (const sheetName of workbook.SheetNames) {
+        const heading = document.createElement("h3");
+        heading.textContent = sheetName;
+        wrapper.appendChild(heading);
+
+        const table = XLSX.utils.sheet_to_html(workbook.Sheets[sheetName]);
+        const holder = document.createElement("div");
+        holder.className = "preview-html";
+        holder.innerHTML = table;
+        wrapper.appendChild(holder);
+      }
+
+      modalBody.innerHTML = "";
+      modalBody.appendChild(wrapper);
+      return;
+    }
+
+    if (extension === "pptx") {
+      const text = await extractPptxText(entry.file);
+      showTextPreview(text || "Kein Text in der Präsentation gefunden.");
+      return;
+    }
+
+    showError("Für diesen Dateityp ist keine Vorschau verfügbar.");
+  } catch (error) {
+    console.error("Vorschaufehler:", error);
+    showError("Die Datei konnte nicht angezeigt werden. Du kannst sie stattdessen herunterladen.");
+  }
+}
+
+async function renderPdfPreview(file) {
+  if (!window.pdfjsLib) {
+    showError("PDF.js konnte nicht geladen werden. Bitte prüfe deine Internetverbindung und lade die Seite neu.");
+    return;
+  }
+
+  modalBody.innerHTML = '<div class="preview-loading">PDF wird geladen …</div>';
+
+  const data = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjsLib.getDocument({ data }).promise;
+
+  modalBody.innerHTML = "";
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    if (!overlay.classList.contains("visible")) return;
+
+    const page = await pdf.getPage(pageNumber);
+    const viewport = page.getViewport({ scale: 1.35 });
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d", { alpha: false });
+
+    canvas.className = "preview-page";
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+    canvas.style.width = "100%";
+    canvas.style.maxWidth = "850px";
+
+    modalBody.appendChild(canvas);
+
+    await page.render({
+      canvasContext: context,
+      viewport
+    }).promise;
+  }
+
+  modalFooter.textContent = pdf.numPages + (pdf.numPages === 1 ? " Seite" : " Seiten");
+}
+
+function showTextPreview(text) {
+  const pre = document.createElement("div");
+  pre.className = "preview-text";
+  pre.textContent = text || "Kein Textinhalt gefunden.";
+
+  modalBody.innerHTML = "";
+  modalBody.appendChild(pre);
+}
+
+function showHtmlPreview(html) {
+  const holder = document.createElement("div");
+  holder.className = "preview-html";
+
+  // Mammoth erzeugt HTML aus dem eigenen Dokument.
+  // Unsichere Elemente und Attribute werden entfernt.
+  const parsed = new DOMParser().parseFromString(html, "text/html");
+  const allowed = new Set([
+    "P", "H1", "H2", "H3", "H4", "UL", "OL", "LI",
+    "TABLE", "THEAD", "TBODY", "TR", "TD", "TH",
+    "STRONG", "B", "EM", "I", "U", "BR", "DIV", "SPAN"
+  ]);
+
+  function cleanNode(node) {
+    for (const child of Array.from(node.children)) {
+      if (!allowed.has(child.tagName)) {
+        child.replaceWith(document.createTextNode(child.textContent || ""));
+      } else {
+        Array.from(child.attributes).forEach((attribute) => {
+          child.removeAttribute(attribute.name);
+        });
+        cleanNode(child);
+      }
+    }
+  }
+
+  cleanNode(parsed.body);
+  holder.innerHTML = parsed.body.innerHTML;
+
+  modalBody.innerHTML = "";
+  modalBody.appendChild(holder);
+}
+
+function showError(message) {
+  const error = document.createElement("div");
+  error.className = "preview-error";
+  error.textContent = message;
+
+  modalBody.innerHTML = "";
+  modalBody.appendChild(error);
+}
+
+/* -------------------------------------------------------
+   EINZELDOWNLOAD
+------------------------------------------------------- */
+
+async function downloadEntry(entry) {
+  const filename = makeFilename(entry);
+
+  try {
+    await deliverBlob(entry.file, filename);
+    setStatus(entry, "Download vorbereitet: " + filename);
+  } catch (error) {
+    console.error("Downloadfehler:", error);
+    showDownloadFallback(entry.file, filename);
+    setStatus(entry, "Bitte über den geöffneten Dialog speichern.");
+  }
+}
+
+/*
+  Desktop: normaler Download über Download-Link.
+  iOS/Safari: zusätzlich einen sichtbaren Öffnen-Link anbieten,
+  falls Safari das download-Attribut ignoriert.
+*/
+async function deliverBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+
+  if (isIOS) {
+    showDownloadLink(url, filename,
+      "Falls der Download nicht automatisch startet, tippe auf den Link und nutze anschließend das Teilen-Menü von Safari, um die Datei in „Dateien“ zu sichern.");
+    return;
+  }
+
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+function showDownloadFallback(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  showDownloadLink(url, filename,
+    "Tippe auf den Link, um die Datei zu öffnen oder zu speichern.");
+}
+
+function showDownloadLink(url, filename, message) {
+  showModal("Datei bereit", message);
+
+  const text = document.createElement("div");
+  text.className = "preview-text";
+  text.textContent = message;
+
+  const link = document.createElement("a");
+  link.className = "download-link";
+  link.href = url;
+  link.download = filename;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.textContent = "Datei öffnen / speichern";
+
+  modalBody.innerHTML = "";
+  modalBody.append(text, link);
+  modalFooter.textContent = filename;
+}
+
+/* -------------------------------------------------------
+   ZIP-DOWNLOAD
+------------------------------------------------------- */
+
+$("zipBtn").addEventListener("click", downloadZip);
+
+async function downloadZip() {
+  if (entries.length === 0) {
+    alert("Es befinden sich keine Dateien in der Liste.");
+    return;
+  }
+
+  if (!window.JSZip) {
+    alert("Die ZIP-Bibliothek konnte nicht geladen werden. Bitte lade die Seite neu.");
+    return;
+  }
+
+  const zip = new JSZip();
+  const usedNames = new Set();
+
+  for (const entry of entries) {
+    const filename = makeFilename(entry);
+    const uniqueName = getUniqueFilename(filename, usedNames);
+    usedNames.add(uniqueName);
+
+    zip.file(uniqueName, entry.file);
+  }
+
+  const button = $("zipBtn");
+  const oldText = button.textContent;
+  button.disabled = true;
+  button.textContent = "ZIP wird erstellt …";
+
+  const progressWrap = $("progressWrap");
+  const progressBar = $("progressBar");
+  progressWrap.style.display = "block";
+  progressBar.style.width = "0%";
+
+  try {
+    const blob = await zip.generateAsync(
+      { type: "blob", compression: "DEFLATE", compressionOptions: { level: 5 } },
+      (metadata) => {
+        progressBar.style.width = metadata.percent.toFixed(0) + "%";
+      }
+    );
+
+    await deliverBlob(blob, "Smart_File_Renamer.zip");
+  } catch (error) {
+    console.error("ZIP-Fehler:", error);
+    alert("Das ZIP-Archiv konnte nicht erstellt werden: " + error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = oldText;
+
+    setTimeout(() => {
+      progressWrap.style.display = "none";
+      progressBar.style.width = "0%";
+    }, 1200);
+  }
+}
+
+function getUniqueFilename(filename, usedNames) {
+  if (!usedNames.has(filename)) return filename;
+
+  const dot = filename.lastIndexOf(".");
+  const base = dot > 0 ? filename.slice(0, dot) : filename;
+  const extension = dot > 0 ? filename.slice(dot) : "";
+
+  let number = 2;
+  let candidate = base + " (" + number + ")" + extension;
+
+  while (usedNames.has(candidate)) {
+    number++;
+    candidate = base + " (" + number + ")" + extension;
+  }
+
+  return candidate;
+}
+
+/* -------------------------------------------------------
+   INITIALISIERUNG
+------------------------------------------------------- */
+
+renderFiles();
+updateCounter();
+
+</script>
+</body>
+</html>
