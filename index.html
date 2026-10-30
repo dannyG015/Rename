@@ -13,7 +13,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#111317;--panel:#1b1f26;--panel2:#252a33;--line:#353c47;--text:#f3f5f7;--muted:#a4acb8;--accent:#e7ebf0;--green:#62d39a;--red:#ff9292}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}.app{width:min(1080px,94%);margin:auto;padding:30px 0 65px}header{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:27px}h1{font-size:clamp(26px,5vw,36px);letter-spacing:-1px;margin:0 0 6px}.sub{font-size:14px;color:var(--muted)}.tag{border:1px solid var(--line);border-radius:30px;padding:8px 12px;color:#cbd1d9;font-size:12px;white-space:nowrap}.drop{border:1.5px dashed #515b69;border-radius:17px;background:#191d23;padding:38px 18px;text-align:center;transition:.2s;cursor:pointer}.drop.over{border-color:#f1f3f6;background:#262c35}.drop .symbol{font-size:34px;margin-bottom:10px}.drop h2{font-size:18px;margin:0 0 7px}.drop p{font-size:13px;color:var(--muted);margin:0 0 17px}.btn{border:0;border-radius:9px;padding:11px 15px;font-size:13px;font-weight:650}.primary{background:var(--accent);color:#15181d}.secondary{background:#343b46;color:var(--text)}.danger{background:#492b30;color:#ffc0c0}.btn:disabled{opacity:.5;cursor:wait}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:27px 0 14px}.toolbar h2{font-size:17px;margin:0}.count{font-size:13px;color:var(--muted);margin-left:8px}.actions{display:flex;gap:8px;flex-wrap:wrap}.list{display:grid;gap:11px}.empty{padding:38px 15px;border:1px dashed var(--line);border-radius:13px;text-align:center;color:var(--muted);font-size:14px}.file{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:13px;align-items:center}.file-main{min-width:0}.original{font-size:12px;color:var(--muted);overflow-wrap:anywhere;margin-bottom:8px}.name-row{display:flex;gap:8px;align-items:center}.name-input{width:100%;min-width:0;background:#11151a;color:var(--text);border:1px solid #48515e;border-radius:8px;padding:10px;outline:none}.name-input:focus{border-color:#e3e7ec;box-shadow:0 0 0 2px #e3e7ec22}.extension{color:var(--muted);font-size:12px;white-space:nowrap}.status{font-size:11px;color:var(--muted);margin-top:7px;min-height:14px}.file-actions{display:flex;gap:7px}.icon{width:39px;height:39px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:#f1f3f5;display:grid;place-items:center}.icon svg{width:18px;height:18px}.icon.del{color:var(--red)}.progress{height:4px;background:#303640;border-radius:5px;overflow:hidden;margin-top:17px;display:none}.bar{height:100%;width:0;background:#e4e8ed;transition:width .15s}.note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:15px}.overlay{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:12px;background:#07090dcc;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);opacity:0;transition:opacity .18s}.overlay.open{display:flex;opacity:1}.modal{width:min(960px,100%);height:min(91vh,900px);background:#191d23;border:1px solid #424a56;border-radius:15px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 90px #0009}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}.modal-title{font-size:14px;font-weight:650;overflow-wrap:anywhere}.close{border:0;border-radius:8px;background:#343b46;color:white;width:36px;height:36px;font-size:23px}.modal-body{padding:16px;overflow:auto;min-height:0;flex:1;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.modal-foot{padding:11px 15px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.loading,.error{padding:45px 15px;text-align:center;color:var(--muted);line-height:1.6}.preview-image{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;margin:auto;border-radius:5px;background:#fff}.preview-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:14px}.doc-preview{background:white;color:#17191d;border-radius:7px;padding:22px;line-height:1.5;overflow-wrap:anywhere}.doc-preview img{max-width:100%}.pdf-page{display:block;width:100%;max-width:850px;height:auto;margin:0 auto 16px;background:white;box-shadow:0 3px 15px #0005}.download-link{display:inline-block;margin-top:14px;padding:12px 16px;border-radius:9px;background:#e7ebf0;color:#17191d;font-weight:700;text-decoration:none;overflow-wrap:anywhere}.hidden{display:none!important}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}.app{width:min(1080px,94%);margin:auto;padding:30px 0 65px}header{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:27px}h1{font-size:clamp(26px,5vw,36px);letter-spacing:-1px;margin:0 0 6px}.sub{font-size:14px;color:var(--muted)}.tag{border:1px solid var(--line);border-radius:30px;padding:8px 12px;color:#cbd1d9;font-size:12px;white-space:nowrap}.drop{border:1.5px dashed #515b69;border-radius:17px;background:#191d23;padding:38px 18px;text-align:center;transition:.2s;cursor:pointer}.drop.over{border-color:#f1f3f6;background:#262c35}.drop .symbol{font-size:34px;margin-bottom:10px}.drop h2{font-size:18px;margin:0 0 7px}.drop p{font-size:13px;color:var(--muted);margin:0 0 17px}.btn{border:0;border-radius:9px;padding:11px 15px;font-size:13px;font-weight:650}.primary{background:var(--accent);color:#15181d}.secondary{background:#343b46;color:var(--text)}.danger{background:#492b30;color:#ffc0c0}.btn:disabled{opacity:.5;cursor:wait}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:27px 0 14px}.toolbar h2{font-size:17px;margin:0}.count{font-size:13px;color:var(--muted);margin-left:8px}.actions{display:flex;gap:8px;flex-wrap:wrap}.list{display:grid;gap:11px}.empty{padding:38px 15px;border:1px dashed var(--line);border-radius:13px;text-align:center;color:var(--muted);font-size:14px}.file{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:13px;align-items:center}.file-main{min-width:0}.original{font-size:12px;color:var(--muted);overflow-wrap:anywhere;margin-bottom:8px}.name-row{display:flex;gap:8px;align-items:center}.name-input{width:100%;min-width:0;background:#11151a;color:var(--text);border:1px solid #48515e;border-radius:8px;padding:10px;outline:none}.name-input:focus{border-color:#e3e7ec;box-shadow:0 0 0 2px #e3e7ec22}.extension{color:var(--muted);font-size:12px;white-space:nowrap}.status{font-size:11px;color:var(--muted);margin-top:7px;min-height:14px}.file-actions{display:flex;gap:7px}.icon{width:39px;height:39px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:#f1f3f5;display:grid;place-items:center}.icon svg{width:18px;height:18px}.icon.del{color:var(--red)}.progress{height:4px;background:#303640;border-radius:5px;overflow:hidden;margin-top:17px;display:none}.bar{height:100%;width:0;background:#e4e8ed;transition:width .15s}.note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:15px}.overlay{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:12px;background:#07090dcc;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);opacity:0;transition:opacity .18s}.overlay.open{display:flex;opacity:1}.modal{width:min(960px,100%);height:min(91vh,900px);background:#191d23;border:1px solid #424a56;border-radius:15px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 90px #0009}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}.modal-title{font-size:14px;font-weight:650;overflow-wrap:anywhere}.close{border:0;border-radius:8px;background:#343b46;color:white;width:36px;height:36px;font-size:23px}.modal-body{padding:16px;overflow:auto;min-height:0;flex:1;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.modal-foot{padding:11px 15px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.loading,.error{padding:45px 15px;text-align:center;color:var(--muted);line-height:1.6}.preview-image{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;margin:auto;border-radius:5px;background:#fff}.preview-text{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:14px}.doc-preview{background:white;color:#17191d;border-radius:7px;padding:22px;line-height:1.5;overflow-wrap:anywhere}.doc-preview img{max-width:100%}.pdf-page{display:block;width:100%;max-width:850px;height:auto;margin:0 auto 16px;background:white;box-shadow:0 3px 15px #0005}.pdf-page-wrap{position:relative;width:max-content;max-width:100%;margin:0 auto 16px;background:#fff;box-shadow:0 3px 15px #0005}.pdf-page-wrap canvas{display:block;width:100%;height:auto}.pdf-text-layer{position:absolute;inset:0;overflow:hidden;line-height:1;user-select:text;-webkit-user-select:text;touch-action:pan-y}.pdf-text-layer span{position:absolute;color:transparent;white-space:pre;cursor:text;transform-origin:0 0;user-select:text;-webkit-user-select:text}.pdf-text-layer span::selection{background:rgba(55,125,255,.42);color:transparent}.download-link{display:inline-block;margin-top:14px;padding:12px 16px;border-radius:9px;background:#e7ebf0;color:#17191d;font-weight:700;text-decoration:none;overflow-wrap:anywhere}.hidden{display:none!important}
 @media(max-width:620px){.app{padding-top:22px}header{align-items:flex-start}.tag{display:none}.file{grid-template-columns:1fr}.file-actions{justify-content:flex-end}.actions{width:100%}.actions .btn{flex:1}.modal{height:94vh}.name-row{gap:5px}}
 </style>
 </head>
@@ -54,44 +54,70 @@ function normalizeText(t){return String(t||'').replace(/\u0000/g,'').replace(/\r
    - entfernt typische Kopf-/Fußzeilen und Metadaten
 ------------------------------------------------------- */
 const TITLE_STOP=/^(seite\s*\d+|page\s*\d+|slide\s*\d+|folie\s*\d+|inhaltsverzeichnis|table of contents|inhalt|contents|anhang|appendix|microsoft (word|excel|powerpoint)|document|untitled|scan\s*\d*|img[_ -]?\d+)$/i;
-const GENERIC_STOP=/^(datum|date|name|nummer|nr\.?|rechnungsnummer|kundennummer|bestellnummer|auftragsnummer|referenz|version|erstellt am|stand|status|vertraulich|confidential|www\.|https?:\/\/|sehr geehrte|guten tag|hallo|liebe[rs]? )/i;
+const GENERIC_STOP=/^(datum|date|name|nummer|nr\.?|rechnungsnummer|kundennummer|bestellnummer|auftragsnummer|referenz|version|erstellt am|stand|status|vertraulich|confidential|www\.|https?:\/\/|sehr geehrte|guten tag|hallo|liebe[rs]? |vielen dank|mit freundlichen grüßen|freundliche grüße|hiermit|wir freuen uns|bitte beachten sie|anbei erhalten sie|im folgenden|dieses dokument|diese unterlage|kontakt|öffnungszeiten|bankverbindung|geschäftsführer)/i;
+const TITLE_WORDS=/\b(titel|title|projekt|project|bericht|report|analyse|analysis|konzept|concept|anleitung|manual|protokoll|protocol|studie|study|documentation|dokumentation|specification|spezifikation|angebot|rechnung|invoice|vertrag|contract|antrag|application)\b/i;
 function titleQuality(raw){
-  const text=normalizeText(raw).replace(/\s*([,:;])\s*/g,'$1 ').trim();
-  const len=[...text].length, words=text.split(/\s+/).filter(Boolean);
-  if(len<5||len>240||words.length>32)return -1000;
+  const text=normalizeText(raw).replace(/\s+/g,' ').trim();
+  const len=[...text].length,words=text.split(/\s+/).filter(Boolean);
+  if(len<4||len>360||words.length>55)return -1000;
   if(TITLE_STOP.test(text)||GENERIC_STOP.test(text))return -1000;
   if(/^[\d\W_]+$/.test(text)||/^[A-Z0-9_-]{1,8}$/.test(text))return -1000;
   if(/^(tel\.?|telefon|fax|e-?mail|email|straße|str\.|plz|ust-?id)/i.test(text))return -1000;
   let score=0;
-  if(words.length>=2)score+=17;
-  if(words.length>=3&&words.length<=14)score+=10;
-  if(len>=14&&len<=110)score+=15;
-  else if(len>110&&len<=190)score+=8;
+  if(words.length>=2)score+=19;
+  if(words.length>=3&&words.length<=18)score+=10;
+  if(len>=12&&len<=130)score+=17;
+  else if(len>130&&len<=230)score+=12;
+  else if(len>230)score+=4;
   if(/[A-ZÄÖÜ]/.test(text))score+=5;
-  if(/^[A-ZÄÖÜ0-9][^.!?]{4,}$/.test(text))score+=3;
-  if(/\b(bericht|analyse|konzept|anleitung|protokoll|projekt|angebot|rechnung|vertrag|studie|manual|report|proposal|specification|documentation)\b/i.test(text))score+=5;
-  if(/[.!?]$/.test(text))score-=9;
-  if(/[,;:]$/.test(text))score-=3;
-  if(words.length===1){score-=12;if(/^(rechnung|angebot|vertrag|bericht|protokoll|bescheinigung|zertifikat|lebenslauf|bewerbung|zeugnis|antrag|quittung|invoice|receipt|certificate|resume)$/i.test(text))score+=20;}
-  if(words.length>22)score-=20;
+  if(/^[A-ZÄÖÜ0-9][^.!?]{3,}$/.test(text))score+=3;
+  if(TITLE_WORDS.test(text))score+=7;
+  if(/[.!?]$/.test(text))score-=13;
+  if(/[,:;]$/.test(text))score-=2;
+  if(words.length===1){score-=12;if(/^(rechnung|angebot|vertrag|bericht|protokoll|bescheinigung|zertifikat|lebenslauf|bewerbung|zeugnis|antrag|quittung|invoice|receipt|certificate|resume)$/i.test(text))score+=22;}
+  if(words.length>28)score-=Math.min(28,(words.length-28)*2);
+  // Ein normaler Fließtextsatz ist selten ein Dokumenttitel.
+  if(words.length>12&&/[.!?]\s/.test(text))score-=18;
+  if(words.length>5&&/[.!?]$/.test(text))score-=18;
   return score;
 }
+function joinTitleLines(lines){
+  let parts=[];
+  for(const raw of lines){
+    let line=normalizeText(raw).trim();
+    if(!line)continue;
+    // Silbentrennung am Zeilenende korrigieren, ohne normale Bindestriche zu entfernen.
+    if(parts.length&&/[-‐‑]$/.test(parts[parts.length-1])&&/^[a-zäöüß]/.test(line))parts[parts.length-1]=parts[parts.length-1].slice(0,-1)+line;
+    else parts.push(line);
+  }
+  return parts.join(' ').replace(/\s+/g,' ').trim();
+}
 function makeTextCandidates(text){
-  const lines=normalizeText(text).split('\n').map(x=>x.trim()).filter(Boolean).slice(0,180);
+  // Leere Zeilen bleiben als echte Absatzgrenzen erhalten.
+  const lines=String(text||'').replace(/\r/g,'\n').split('\n').map(x=>x.trim());
   const out=[];
   for(let i=0;i<lines.length;i++){
-    for(let count=1;count<=4&&i+count<=lines.length;count++){
-      const group=lines.slice(i,i+count);
-      // Eine mehrzeilige Überschrift darf keine ganzen Fließtextabsätze verbinden.
-      if(group.some(x=>x.length>125||/[.!?,;:]$/.test(x)||GENERIC_STOP.test(x)))break;
-      const joined=group.join(' ').replace(/\s+/g,' ').trim();
-      let score=titleQuality(joined);
-      if(score<0)continue;
-      score+=Math.max(0,18-i*1.15);
-      if(count>1)score+=Math.min(13,(count-1)*5);
-      if(group.every(x=>x.length<65))score+=4;
-      if(group.length>1&&group.some(x=>x.length<3))score-=8;
-      out.push({text:joined,score,source:'text'});
+    if(!lines[i])continue;
+    let group=[];
+    for(let j=i;j<Math.min(lines.length,i+10);j++){
+      const line=lines[j];
+      if(!line)break;
+      if(line.length>145||GENERIC_STOP.test(line))break;
+      if(group.length&&/[.!?]$/.test(group[group.length-1]))break;
+      // Eine Zeile, die wie Fließtext aussieht, darf nicht an eine Überschrift angehängt werden.
+      if(group.length&&line.split(/\s+/).length>18)break;
+      group.push(line);
+      const joined=joinTitleLines(group);
+      const base=titleQuality(joined);
+      if(base<0)continue;
+      let score=base;
+      score+=Math.max(0,25-i*1.25);
+      if(group.length>1)score+=Math.min(24,(group.length-1)*6);
+      if(group.length>6)score-=(group.length-6)*5;
+      if(group.every(x=>x.length<95))score+=4;
+      if(group.some(x=>/[,;:]$/.test(x)))score+=2;
+      if(group.length===1&&line.length<10)score-=5;
+      out.push({text:joined,score,source:'text',lineCount:group.length});
     }
   }
   return out;
@@ -106,50 +132,59 @@ function makeOcrCandidates(lines){
     return {text:normalizeText(line.text),x0,y0,x1,y1,height:Math.max(1,y1-y0),confidence:Number(line.confidence??line.conf??75),block:line.block_num??line.blockNum??null,paragraph:line.par_num??line.parNum??null};
   }).filter(x=>x.text).sort((a,b)=>a.y0-b.y0||a.x0-b.x0);
   if(!clean.length)return [];
-  const maxY=Math.max(...clean.map(x=>x.y1)),minY=Math.min(...clean.map(x=>x.y0)),pageH=Math.max(1,maxY-minY);
-  const typicalH=clean.map(x=>x.height).sort((a,b)=>a-b)[Math.floor(clean.length/2)]||16;
+  const minY=Math.min(...clean.map(x=>x.y0)),maxY=Math.max(...clean.map(x=>x.y1)),pageH=Math.max(1,maxY-minY);
+  const heights=clean.map(x=>x.height).sort((a,b)=>a-b),typicalH=heights[Math.floor(heights.length/2)]||16;
   const out=[];
   for(let i=0;i<clean.length;i++){
-    let group=[];
-    for(let j=i;j<Math.min(clean.length,i+4);j++){
-      const current=clean[j];
+    const group=[];
+    for(let j=i;j<Math.min(clean.length,i+10);j++){
+      const cur=clean[j];
       if(j>i){
-        const prev=clean[j-1],gap=current.y0-prev.y1;
-        const aligned=Math.abs(current.x0-prev.x0)<Math.max(55,typicalH*3.2);
-        const sameBlock=current.block!==null&&prev.block!==null&&current.block===prev.block;
-        if(gap>Math.max(typicalH*1.9,30)||(!aligned&&!sameBlock))break;
+        const prev=clean[j-1],gap=cur.y0-prev.y1;
+        const sameParagraph=cur.block!==null&&prev.block!==null&&cur.block===prev.block&&cur.paragraph!==null&&cur.paragraph===prev.paragraph;
+        const aligned=Math.abs(cur.x0-prev.x0)<Math.max(85,typicalH*4.5);
+        if(gap>Math.max(typicalH*2.6,42)||(!aligned&&!sameParagraph))break;
+        if(/[.!?]$/.test(prev.text)&&!sameParagraph)break;
       }
-      group.push(current);
-      const joined=group.map(x=>x.text).join(' ').replace(/\s+/g,' ').trim();
-      let score=titleQuality(joined);
-      if(score<0)continue;
+      if(cur.text.length>145)break;
+      group.push(cur);
+      const joined=joinTitleLines(group.map(x=>x.text));
+      const base=titleQuality(joined);
+      if(base<0)continue;
+      let score=base;
       const topPosition=1-((group[0].y0-minY)/pageH);
-      score+=Math.max(-5,Math.min(20,topPosition*20));
+      score+=Math.max(-5,Math.min(22,topPosition*22));
       const avgHeight=group.reduce((sum,x)=>sum+x.height,0)/group.length;
-      score+=Math.max(-5,Math.min(14,(avgHeight/typicalH-1)*8));
+      score+=Math.max(-5,Math.min(18,(avgHeight/typicalH-1)*10));
       const confidence=group.reduce((sum,x)=>sum+x.confidence,0)/group.length;
-      score+=Math.max(-10,Math.min(8,(confidence-65)*0.22));
-      if(group.length>1)score+=Math.min(15,(group.length-1)*6);
+      score+=Math.max(-12,Math.min(10,(confidence-60)*.25));
+      if(group.length>1)score+=Math.min(25,(group.length-1)*7);
+      if(group.length>7)score-=(group.length-7)*5;
       const centerX=(Math.min(...group.map(x=>x.x0))+Math.max(...group.map(x=>x.x1)))/2;
       const pageCenter=(Math.min(...clean.map(x=>x.x0))+Math.max(...clean.map(x=>x.x1)))/2;
-      if(Math.abs(centerX-pageCenter)<Math.max(40,typicalH*4))score+=3;
-      out.push({text:joined,score,source:'ocr',top:topPosition});
+      if(Math.abs(centerX-pageCenter)<Math.max(50,typicalH*4))score+=4;
+      out.push({text:joined,score,source:'ocr',top:topPosition,lineCount:group.length});
     }
   }
   return out;
 }
-function titleFromText(text,fallback='',ocrLines=[]){
+function titleFromText(text,fallback='',ocrLines=[],priorityCandidates=[]){
   const candidates=[...makeTextCandidates(text),...makeOcrCandidates(ocrLines)];
+  for(const item of priorityCandidates||[]){
+    const value=typeof item==='string'?item:item.text;
+    const quality=titleQuality(value);
+    if(quality>=0)candidates.push({text:normalizeText(value),score:quality+Number(item.boost||24),source:item.source||'structured'});
+  }
   if(!candidates.length)return fallback;
-  // Fast-Duplikate entfernen und den besten vollständigen Titel wählen.
   const unique=new Map();
-  for(const c of candidates){const key=c.text.toLocaleLowerCase('de-DE');const old=unique.get(key);if(!old||c.score>old.score)unique.set(key,c)}
+  for(const c of candidates){
+    const key=c.text.toLocaleLowerCase('de-DE').replace(/\s+/g,' ');
+    const old=unique.get(key);if(!old||c.score>old.score)unique.set(key,c);
+  }
   const ranked=[...unique.values()].sort((a,b)=>b.score-a.score);
   const best=ranked[0];
-  // Nur bei ausreichender Evidenz automatisch umbenennen.
-  return best&&best.score>=25?best.text:fallback;
+  return best&&best.score>=28?best.text:fallback;
 }
-
 async function getOCRWorker(){
   if(!window.Tesseract)throw Error('OCR-Bibliothek nicht geladen');
   if(!ocrWorkerPromise)ocrWorkerPromise=Tesseract.createWorker('deu+eng',1,{logger:m=>{if(m.status==='recognizing text'){/* OCR-Fortschritt */}}});
@@ -172,20 +207,45 @@ async function ocrImage(file){
 async function pdfText(file){
   if(!window.pdfjsLib)throw Error('PDF.js fehlt');
   const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
-  let out='';
-  for(let n=1;n<=Math.min(pdf.numPages,8);n++){
+  let out='',priority=[];
+  try{
+    const meta=await pdf.getMetadata();
+    const title=meta?.info?.Title;
+    if(title&&title.trim())priority.push({text:title,boost:22,source:'PDF-Metadaten'});
+  }catch(_){/* Metadaten sind optional. */}
+  for(let n=1;n<=Math.min(pdf.numPages,10);n++){
     const page=await pdf.getPage(n),content=await page.getTextContent(),items=content.items.filter(x=>x.str?.trim());
     const rows=[];
     for(const item of items){
-      const y=item.transform?.[5]||0,x=item.transform?.[4]||0;
-      let row=rows.find(r=>Math.abs(r.y-y)<Math.max(2,(item.height||10)*.45));
-      if(!row){row={y,items:[]};rows.push(row)}
-      row.items.push({x,text:item.str.trim()});
+      const y=item.transform?.[5]||0,x=item.transform?.[4]||0,h=Math.abs(item.height||item.transform?.[3]||10);
+      let row=rows.find(r=>Math.abs(r.y-y)<Math.max(2,h*.45));
+      if(!row){row={y,items:[],height:h};rows.push(row)}
+      row.height=Math.max(row.height,h);row.items.push({x,text:item.str.trim(),height:h});
     }
     rows.sort((a,b)=>b.y-a.y);
-    out+='\n'+rows.map(r=>r.items.sort((a,b)=>a.x-b.x).map(x=>x.text).join(' ').trim()).filter(Boolean).join('\n');
+    const median=rows.map(r=>r.height).sort((a,b)=>a-b)[Math.floor(rows.length/2)]||10;
+    let previousY=null;
+    const pageLines=[];
+    for(const row of rows){
+      const line=row.items.sort((a,b)=>a.x-b.x).map(x=>x.text).join(' ').replace(/\s+/g,' ').trim();
+      if(!line)continue;
+      if(previousY!==null&&previousY-row.y>median*1.75)pageLines.push('');
+      pageLines.push(line);previousY=row.y;
+    }
+    out+='\n'+pageLines.join('\n');
+    // Große, im oberen Seitenbereich platzierte Zeilen sind starke Titelindikatoren.
+    const view=page.view||[0,0,600,800],pageHeight=Math.max(1,view[3]-view[1]);
+    const upperRows=rows.filter(r=>((r.y-view[1])/pageHeight)>.42&&r.height>=median*1.16).slice(0,8);
+    if(n===1&&upperRows.length){
+      let block=[];
+      for(const row of upperRows){
+        const line=row.items.sort((a,b)=>a.x-b.x).map(x=>x.text).join(' ').trim();
+        if(line)block.push(line);
+      }
+      if(block.length)priority.push({text:joinTitleLines(block),boost:30,source:'PDF-Layout'});
+    }
   }
-  return out;
+  return {text:out,priority};
 }
 async function pptxText(file){
   let zip=await JSZip.loadAsync(file),names=Object.keys(zip.files).filter(x=>/^ppt\/slides\/slide\d+\.xml$/i.test(x)).sort((a,b)=>Number(a.match(/slide(\d+)/i)[1])-Number(b.match(/slide(\d+)/i)[1]));
@@ -204,25 +264,39 @@ async function pptxText(file){
   return out;
 }
 async function analyze(f){
-  const e=extOf(f.file.name);let text='',ocrLines=[];
+  const e=extOf(f.file.name);let text='',ocrLines=[],priority=[];
   try{
-    if(e==='pdf')text=await pdfText(f.file);
-    else if(e==='docx')text=(await mammoth.extractRawText({arrayBuffer:await f.file.arrayBuffer()})).value;
-    else if(e==='xlsx'||e==='xls'){
+    if(e==='pdf'){
+      const result=await pdfText(f.file);text=result.text;priority.push(...result.priority);
+    }else if(e==='docx'){
+      const buffer=await f.file.arrayBuffer();
+      text=(await mammoth.extractRawText({arrayBuffer:buffer})).value;
+      const html=(await mammoth.convertToHtml({arrayBuffer:buffer})).value;
+      const doc=new DOMParser().parseFromString(html,'text/html');
+      for(const heading of Array.from(doc.querySelectorAll('h1,h2,h3')).slice(0,12)){
+        const value=heading.textContent.trim();if(value)priority.push({text:value,boost:38,source:'DOCX-Überschrift'});
+      }
+      const first=doc.body.querySelector('p');
+      if(first&&first.textContent.trim().length<180)priority.push({text:first.textContent.trim(),boost:10,source:'DOCX-Absatz'});
+    }else if(e==='xlsx'||e==='xls'){
       const wb=XLSX.read(await f.file.arrayBuffer(),{type:'array'});
       const metadata=[wb.Props?.Title,wb.Props?.Subject].filter(Boolean);
       text=metadata.join('\n')+'\n'+wb.SheetNames.join('\n');
+      for(const value of metadata)priority.push({text:value,boost:34,source:'Tabellen-Metadaten'});
       for(let s of wb.SheetNames.slice(0,4))text+='\n'+XLSX.utils.sheet_to_csv(wb.Sheets[s]).slice(0,12000);
-    }else if(e==='pptx')text=await pptxText(f.file);
-    else if(e==='txt')text=await f.file.text();
+    }else if(e==='pptx'){
+      text=await pptxText(f.file);
+      const firstSlide=text.split('\n').map(x=>x.trim()).filter(Boolean).slice(0,3);
+      if(firstSlide.length)priority.push({text:firstSlide[0],boost:30,source:'PowerPoint-Titel'});
+    }else if(e==='txt')text=await f.file.text();
     else if(['png','jpg','jpeg','webp'].includes(e)){
       setStatus(f,'Bild wird per OCR vollständig analysiert …');
       const result=await ocrImage(f.file);text=result.text;ocrLines=result.lines;
     }
   }catch(err){console.warn('Analyse:',err);setStatus(f,'Automatische Erkennung nicht möglich – Dateiname manuell bearbeiten.');f.ready=true;return}
   f.text=normalizeText(text);
-  const suggestion=titleFromText(f.text,'',ocrLines);
-  if(suggestion){if(!f.edited)f.title=suggestion;setStatus(f,'Vollständiger Titel erkannt – Dateiname kann bearbeitet werden.')}
+  const suggestion=titleFromText(f.text,'',ocrLines,priority);
+  if(suggestion){if(!f.edited)f.title=suggestion;setStatus(f,'Titelvorschlag erstellt – bitte vollständigen Titel prüfen.');}
   else if(['png','jpg','jpeg','webp'].includes(e)){
     if(!f.edited)f.title='Bild_'+new Date().toISOString().slice(0,10)+'_'+String(f.id).padStart(3,'0');
     setStatus(f,'Kein sicherer Titel erkannt – neutraler Bildname vorgeschlagen.');
@@ -236,7 +310,115 @@ function openModal(title,foot='Vorschau'){modalToken++;$('modalTitle').textConte
 function closeModal(){modalToken++;$('overlay').classList.remove('open');document.body.style.overflow='';setTimeout(()=>{if(!$('overlay').classList.contains('open')){$('overlay').style.display='none';$('modalBody').innerHTML=''}},200)}
 $('close').addEventListener('click',closeModal);$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('overlay').classList.contains('open'))closeModal()});
 async function preview(f){let e=extOf(f.file.name),token=openModal(outputName(f));try{if(['png','jpg','jpeg','webp'].includes(e)){let url=URL.createObjectURL(f.file),img=new Image();img.className='preview-image';img.alt=outputName(f);img.onload=()=>{if(token===modalToken){$('modalBody').replaceChildren(img);$('modalFoot').textContent=img.naturalWidth+' × '+img.naturalHeight+' Pixel'}};img.onerror=()=>{if(token===modalToken)showError('Das Bild konnte nicht geladen werden.')};img.src=url;return}if(e==='pdf'){await renderPDF(f.file,token);return}if(e==='txt'){showText(await f.file.text(),token);return}if(e==='docx'){let r=await mammoth.convertToHtml({arrayBuffer:await f.file.arrayBuffer()});showDocument(r.value,token);return}if(e==='xlsx'||e==='xls'){let wb=XLSX.read(await f.file.arrayBuffer(),{type:'array'}),wrap=document.createElement('div');for(let s of wb.SheetNames){let h=document.createElement('h3');h.textContent=s;wrap.append(h);let d=document.createElement('div');d.className='doc-preview';d.innerHTML=XLSX.utils.sheet_to_html(wb.Sheets[s]);wrap.append(d)}if(token===modalToken)$('modalBody').replaceChildren(wrap);return}if(e==='pptx'){showText(await pptxText(f.file),token);return}showError('Für diesen Dateityp ist keine Vorschau verfügbar.',token)}catch(err){console.error(err);showError('Die Vorschau konnte nicht geladen werden: '+(err.message||err),token)}}
-async function renderPDF(file,token){if(!window.pdfjsLib)throw Error('PDF.js konnte nicht geladen werden.');let pdf=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;if(token!==modalToken)return;$('modalBody').innerHTML='';for(let n=1;n<=pdf.numPages;n++){if(token!==modalToken)return;let page=await pdf.getPage(n),viewport=page.getViewport({scale:Math.min(1.6,Math.max(1,window.devicePixelRatio||1))}),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{alpha:false});canvas.className='pdf-page';canvas.width=Math.floor(viewport.width);canvas.height=Math.floor(viewport.height);canvas.style.width='100%';$('modalBody').append(canvas);await page.render({canvasContext:ctx,viewport}).promise}$('modalFoot').textContent=pdf.numPages+(pdf.numPages===1?' Seite':' Seiten')}
+async function renderPDF(file,token){
+  if(!window.pdfjsLib)throw Error('PDF.js konnte nicht geladen werden.');
+  const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+  if(token!==modalToken)return;
+  $('modalBody').innerHTML='';
+  let pagesWithText=0,pagesWithoutText=0;
+  for(let n=1;n<=pdf.numPages;n++){
+    if(token!==modalToken)return;
+    const page=await pdf.getPage(n);
+    const baseViewport=page.getViewport({scale:1});
+    const availableWidth=Math.max(260,Math.min(850,$('modalBody').clientWidth-34));
+    // Die PDF-Seite wird in CSS-Pixeln passend zum Vorschaufenster gerendert.
+    const scale=Math.min(1.25,availableWidth/baseViewport.width);
+    const viewport=page.getViewport({scale});
+    const outputScale=Math.max(1,window.devicePixelRatio||1);
+    const wrapper=document.createElement('div');
+    wrapper.className='pdf-page-wrap';
+    wrapper.style.width=viewport.width+'px';
+    wrapper.style.maxWidth='100%';
+    const canvas=document.createElement('canvas');
+    canvas.className='pdf-page';
+    canvas.width=Math.ceil(viewport.width*outputScale);
+    canvas.height=Math.ceil(viewport.height*outputScale);
+    canvas.style.width='100%';
+    canvas.style.maxWidth='none';
+    canvas.style.margin='0';
+    const ctx=canvas.getContext('2d',{alpha:false});
+    ctx.setTransform(outputScale,0,0,outputScale,0,0);
+    wrapper.appendChild(canvas);
+    $('modalBody').appendChild(wrapper);
+    await page.render({canvasContext:ctx,viewport}).promise;
+    if(token!==modalToken)return;
+
+    // PDF.js erzeugt eine unsichtbare, aber auswählbare Textebene.
+    // Damit kann der Nutzer Text mit Maus oder Touch markieren und kopieren.
+    const textContent=await page.getTextContent();
+    const textItems=(textContent.items||[]).filter(item=>item.str&&item.str.trim());
+    if(textItems.length&&typeof pdfjsLib.renderTextLayer==='function'){
+      const textLayer=document.createElement('div');
+      textLayer.className='pdf-text-layer textLayer';
+      textLayer.style.width=viewport.width+'px';
+      textLayer.style.height=viewport.height+'px';
+      wrapper.appendChild(textLayer);
+      const textDivs=[];
+      const renderTask=pdfjsLib.renderTextLayer({
+        textContent,
+        container:textLayer,
+        viewport,
+        textDivs,
+        enhanceTextSelection:true
+      });
+      if(renderTask&&renderTask.promise)await renderTask.promise;
+      pagesWithText++;
+    }else if(textItems.length){
+      // Fallback für Builds, die renderTextLayer nicht exportieren.
+      const textLayer=document.createElement('div');
+      textLayer.className='pdf-text-layer';
+      textLayer.style.width=viewport.width+'px';
+      textLayer.style.height=viewport.height+'px';
+      wrapper.appendChild(textLayer);
+      for(const item of textItems){
+        const tx=pdfjsLib.Util.transform(viewport.transform,item.transform);
+        const fontHeight=Math.hypot(tx[2],tx[3]);
+        const span=document.createElement('span');
+        span.textContent=item.str;
+        span.style.left=tx[4]+'px';
+        span.style.top=(tx[5]-fontHeight)+'px';
+        span.style.fontSize=fontHeight+'px';
+        span.style.height=fontHeight+'px';
+        span.style.transform='scaleX('+(item.width?Math.max(.1,(item.width*scale)/(Math.max(1,item.str.length*fontHeight*.5))):1)+')';
+        textLayer.appendChild(span);
+      }
+      pagesWithText++;
+    }else{
+      pagesWithoutText++;
+      // Bei gescannten PDFs existiert keine echte PDF-Textebene.
+      // OCR wird als auswählbare Textebene über das gerenderte Seitenbild gelegt.
+      if(window.Tesseract){
+        try{
+          const worker=await getOCRWorker();
+          const ocr=await worker.recognize(canvas);
+          const layer=document.createElement('div');
+          layer.className='pdf-text-layer';
+          layer.style.width=viewport.width+'px';
+          layer.style.height=viewport.height+'px';
+          wrapper.appendChild(layer);
+          const lines=(ocr.data?.lines||[]).filter(line=>line.text&&line.bbox);
+          for(const line of lines){
+            const span=document.createElement('span');
+            span.textContent=line.text;
+            span.style.left=(line.bbox.x0/outputScale)+'px';
+            span.style.top=(line.bbox.y0/outputScale)+'px';
+            span.style.width=((line.bbox.x1-line.bbox.x0)/outputScale)+'px';
+            span.style.height=Math.max(8,(line.bbox.y1-line.bbox.y0)/outputScale)+'px';
+            span.style.fontSize=Math.max(8,(line.bbox.y1-line.bbox.y0)/outputScale)+'px';
+            layer.appendChild(span);
+          }
+        }catch(ocrError){
+          console.warn('OCR-Textebene für PDF-Seite '+n+' nicht verfügbar:',ocrError);
+        }
+      }
+    }
+  }
+  if(token!==modalToken)return;
+  let foot=pdf.numPages+(pdf.numPages===1?' Seite':' Seiten')+' · Text markieren und kopieren';
+  if(pagesWithoutText>0&&!window.Tesseract)foot+=' · Einige Seiten sind Scans ohne Textebene';
+  else if(pagesWithoutText>0)foot+=' · Scantext wird per OCR bereitgestellt';
+  $('modalFoot').textContent=foot;
+}
 function showText(t,token){if(token!==modalToken)return;let el=document.createElement('div');el.className='preview-text';el.textContent=t||'Kein Textinhalt gefunden.';$('modalBody').replaceChildren(el)}
 function showDocument(html,token){if(token!==modalToken)return;let parsed=new DOMParser().parseFromString(html,'text/html'),allowed=new Set(['P','H1','H2','H3','H4','UL','OL','LI','TABLE','THEAD','TBODY','TR','TD','TH','STRONG','B','EM','I','U','BR','DIV','SPAN']);function clean(node){for(let child of Array.from(node.children)){if(!allowed.has(child.tagName))child.replaceWith(document.createTextNode(child.textContent||''));else{Array.from(child.attributes).forEach(a=>child.removeAttribute(a.name));clean(child)}}}clean(parsed.body);let d=document.createElement('div');d.className='doc-preview';d.innerHTML=parsed.body.innerHTML;$('modalBody').replaceChildren(d)}
 function showError(msg,token=modalToken){if(token!==modalToken)return;let el=document.createElement('div');el.className='error';el.textContent=msg;$('modalBody').replaceChildren(el)}
